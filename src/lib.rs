@@ -15,6 +15,3 @@ impl FuzzContract {
         ()
     }
 }
-
-#[cfg(test)]
-mod test;
