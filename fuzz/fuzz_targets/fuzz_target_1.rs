@@ -18,5 +18,6 @@ fuzz_target!(|input: <FuzzInstruction as SorobanArbitrary>::Prototype| {
     let client = fuzzcontract::Client::new(&env, &contract_id);
 
     let fuzz_instruction = FuzzInstruction::from_val(&env, &input);
-    let fuzz_run = client.run(&fuzz_instruction);
+
+    client.run(&fuzz_instruction)
 });
