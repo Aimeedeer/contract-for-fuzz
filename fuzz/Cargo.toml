@@ -1,0 +1,45 @@
+[package]
+name = "contract-for-fuzz-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[features]
+default = ["testutils"]
+testutils = ["soroban-sdk/testutils", "contract-for-fuzz/testutils"]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.contract-for-fuzz]
+path = ".."
+
+[dependencies.soroban-sdk]
+path = "../../rs-soroban-sdk/soroban-sdk"
+
+[patch."https://github.com/stellar/rs-soroban-env"]
+soroban-env-common = { path = "../../rs-soroban-env/soroban-env-common" }
+soroban-env-guest = { path = "../../rs-soroban-env/soroban-env-guest" }
+soroban-env-host = { path = "../../rs-soroban-env/soroban-env-host" }
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "rawval_fuzz"
+path = "fuzz_targets/rawval_fuzz.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "typed_fuzz"
+path = "fuzz_targets/typed_fuzz.rs"
+test = false
+doc = false
