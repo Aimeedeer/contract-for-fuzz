@@ -11,7 +11,7 @@ cargo-fuzz = true
 libfuzzer-sys = "0.4"
 
 [dependencies.soroban-sdk]
-path = "../../rs-soroban-sdk/soroban-sdk"
+version = "0.8.0"
 features = ["testutils"]
 
 [features]
@@ -32,8 +32,3 @@ name = "fuzz_target_1"
 path = "fuzz_targets/fuzz_target_1.rs"
 test = false
 doc = false
-
-[patch."https://github.com/stellar/rs-soroban-env"]
-soroban-env-common = { path = "../../rs-soroban-env/soroban-env-common" }
-soroban-env-guest = { path = "../../rs-soroban-env/soroban-env-guest" }
-soroban-env-host = { path = "../../rs-soroban-env/soroban-env-host" }
