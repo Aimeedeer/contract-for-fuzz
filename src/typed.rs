@@ -1,8 +1,8 @@
 use core::mem;
-use soroban_env_common::{U32Val, BytesObject};
+use soroban_env_common::{U32Val, AddressObject, BytesObject, SymbolObject};
 use soroban_sdk::contracttype;
 use crate::{FakeRawVal, syscalls};
-use soroban_sdk::Bytes;
+use soroban_sdk::{Address, Bytes, RawVal, Symbol, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -22,12 +22,12 @@ pub enum TypedFuzzInstruction {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModAddress {
-    AccountPublicKeyToAddress(FakeRawVal),
-    AddressToAccountPublicKey(FakeRawVal),
-    AddressToContractId(FakeRawVal),
-    ContractIdToAddressRequireAuth(FakeRawVal),
-    RequireAuth(FakeRawVal),
-    RequireAuthForArgs(FakeRawVal, FakeRawVal),
+    AccountPublicKeyToAddress(Bytes),
+    AddressToAccountPublicKey(Address),
+    AddressToContractId(Address),
+    ContractIdToAddress(Bytes),
+    RequireAuth(Address),
+    RequireAuthForArgs(Address, Vec<RawVal>),
 }
 
 #[contracttype]
@@ -62,8 +62,8 @@ pub enum TypedModBuf {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModCall {
-    Call(FakeRawVal, FakeRawVal, FakeRawVal),
-    TryCall(FakeRawVal, FakeRawVal, FakeRawVal),
+    Call(Bytes, Symbol, Vec<RawVal>),
+    TryCall(Bytes, Symbol, Vec<RawVal>),
 }
 
 #[contracttype]
@@ -178,28 +178,28 @@ impl TypedFuzzInstruction {
         match fuzz_instruction {
             Address(v) => match v {
                 TypedModAddress::AccountPublicKeyToAddress(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = BytesObject::from(v);
                     syscalls::address::account_public_key_to_address(v);
                 },
                 TypedModAddress::AddressToAccountPublicKey(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::address::address_to_account_public_key(v);
                 },
                 TypedModAddress::AddressToContractId(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::address::address_to_contract_id(v);
                 },
-                TypedModAddress::ContractIdToAddressRequireAuth(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                TypedModAddress::ContractIdToAddress(v) => unsafe {
+                    let v = BytesObject::from(v);
+                    syscalls::address::contract_id_to_address(v);
+                },
+                TypedModAddress::RequireAuth(v) => unsafe {
+                    let v = v.to_object();
                     syscalls::address::require_auth(v);
                 },
-                TypedModAddress::RequireAuth(v_0) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    syscalls::address::require_auth(v_0);
-                },
                 TypedModAddress::RequireAuthForArgs(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_0 = v_0.to_object();
+                    let v_1 = v_1.to_object();
                     syscalls::address::require_auth_for_args(v_0, v_1);
                 },
             },
@@ -343,16 +343,16 @@ impl TypedFuzzInstruction {
             },
             Call(v) => match v {
                 TypedModCall::Call(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_0 = BytesObject::from(v_0);
+                    let v_1 = v_1.to_val();
+                    let v_2 = v_2.to_object();
 
                     syscalls::call::call(v_0, v_1, v_2);
                 },
                 TypedModCall::TryCall(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_0 = BytesObject::from(v_0);
+                    let v_1 = v_1.to_val();
+                    let v_2 = v_2.to_object();
 
                     syscalls::call::call(v_0, v_1, v_2);
                 },

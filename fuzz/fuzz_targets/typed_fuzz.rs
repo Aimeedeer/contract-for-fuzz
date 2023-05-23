@@ -4,12 +4,12 @@ use libfuzzer_sys::fuzz_target;
 use soroban_sdk::{
     Env, FromVal, RawVal, IntoVal,
 };
+use soroban_sdk::{Address, Bytes, Vec};
 use fuzzcontract::*;
 use soroban_sdk::arbitrary::SorobanArbitrary;
 use soroban_sdk::arbitrary::arbitrary;
 use soroban_sdk::arbitrary::fuzz_catch_panic;
 use soroban_sdk::testutils::Logger;
-use soroban_sdk::Bytes;
 
 mod fuzzcontract {
     soroban_sdk::contractimport!(file = "../target/wasm32-unknown-unknown/release/contract_for_fuzz.wasm");
@@ -18,12 +18,12 @@ mod fuzzcontract {
 #[derive(Clone, Debug)]
 #[derive(arbitrary::Arbitrary)]
 pub enum TypedFuzzInstructionPrototype {
-    AccountPublicKeyToAddress(<RawVal as SorobanArbitrary>::Prototype),
-    AddressToAccountPublicKey(<RawVal as SorobanArbitrary>::Prototype),
-    AddressToContractId(<RawVal as SorobanArbitrary>::Prototype),
-    ContractIdToAddressRequireAuth(<RawVal as SorobanArbitrary>::Prototype),
-    RequireAuth(<RawVal as SorobanArbitrary>::Prototype),
-    RequireAuthForArgs(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+    AccountPublicKeyToAddress(<Bytes as SorobanArbitrary>::Prototype),
+    AddressToAccountPublicKey(<Address as SorobanArbitrary>::Prototype),
+    AddressToContractId(<Address as SorobanArbitrary>::Prototype),
+    ContractIdToAddress(<Bytes as SorobanArbitrary>::Prototype),
+    RequireAuth(<Address as SorobanArbitrary>::Prototype),
+    RequireAuthForArgs(<Address as SorobanArbitrary>::Prototype, <Vec<RawVal> as SorobanArbitrary>::Prototype),
 
     BytesAppend(<Bytes as SorobanArbitrary>::Prototype, <Bytes as SorobanArbitrary>::Prototype),
     BytesBack(<Bytes as SorobanArbitrary>::Prototype),
@@ -292,29 +292,29 @@ impl TypedFuzzInstructionPrototype {
     fn to_guest(&self, env: &Env) -> TypedFuzzInstruction {
         match self {
             TypedFuzzInstructionPrototype::AccountPublicKeyToAddress(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Address(TypedModAddress::AccountPublicKeyToAddress(FakeRawVal(v.get_payload())))
+                let v = Bytes::from_val(env, v);
+                TypedFuzzInstruction::Address(TypedModAddress::AccountPublicKeyToAddress(v))
             }
             TypedFuzzInstructionPrototype::AddressToAccountPublicKey(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Address(TypedModAddress::AddressToAccountPublicKey(FakeRawVal(v.get_payload())))
+                let v = Address::from_val(env, v);
+                TypedFuzzInstruction::Address(TypedModAddress::AddressToAccountPublicKey(v))
             }
             TypedFuzzInstructionPrototype::AddressToContractId(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Address(TypedModAddress::AddressToContractId(FakeRawVal(v.get_payload())))
+                let v = Address::from_val(env, v);
+                TypedFuzzInstruction::Address(TypedModAddress::AddressToContractId(v))
             }
-            TypedFuzzInstructionPrototype::ContractIdToAddressRequireAuth(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Address(TypedModAddress::ContractIdToAddressRequireAuth(FakeRawVal(v.get_payload())))
+            TypedFuzzInstructionPrototype::ContractIdToAddress(v) => {
+                let v = Bytes::from_val(env, v);
+                TypedFuzzInstruction::Address(TypedModAddress::ContractIdToAddress(v))
             }
-            TypedFuzzInstructionPrototype::RequireAuth(v_0) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                TypedFuzzInstruction::Address(TypedModAddress::RequireAuth(FakeRawVal(v_0.get_payload())))
+            TypedFuzzInstructionPrototype::RequireAuth(v) => {
+                let v = Address::from_val(env, v);
+                TypedFuzzInstruction::Address(TypedModAddress::RequireAuth(v))
             }
             TypedFuzzInstructionPrototype::RequireAuthForArgs(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                let v_1 = RawVal::from_val(env, v_1);
-                TypedFuzzInstruction::Address(TypedModAddress::RequireAuthForArgs(FakeRawVal(v_0.get_payload()), FakeRawVal(v_1.get_payload())))
+                let v_0 = Address::from_val(env, v_0);
+                let v_1 = Vec::<RawVal>::from_val(env, v_1);
+                TypedFuzzInstruction::Address(TypedModAddress::RequireAuthForArgs(v_0, v_1))
             }
             TypedFuzzInstructionPrototype::BytesAppend(v_0, v_1) => {
                 TypedFuzzInstruction::Buf(TypedModBuf::BytesAppend(v_0.into_val(env), v_1.into_val(env)))
@@ -438,24 +438,16 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Buf(TypedModBuf::SymbolNewFromLinearMemory(*v_0, *v_1))
             }
             TypedFuzzInstructionPrototype::Call(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                let v_1 = RawVal::from_val(env, v_1);
-                let v_2 = RawVal::from_val(env, v_2);
-                TypedFuzzInstruction::Call(TypedModCall::Call(
-                    FakeRawVal(v_0.get_payload()),
-                    FakeRawVal(v_1.get_payload()),
-                    FakeRawVal(v_2.get_payload()),
-                ))
+                let v_0 = Bytes::from_val(env, v_0);
+                let v_1 = Symbol::from_val(env, v_1);
+                let v_2 = Vec::<RawVal>::from_val(env, v_2);
+                TypedFuzzInstruction::Call(TypedModCall::Call(v_0, v_1, v_2))
             }
             TypedFuzzInstructionPrototype::TryCall(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                let v_1 = RawVal::from_val(env, v_1);
-                let v_2 = RawVal::from_val(env, v_2);
-                TypedFuzzInstruction::Call(TypedModCall::TryCall(
-                    FakeRawVal(v_0.get_payload()),
-                    FakeRawVal(v_1.get_payload()),
-                    FakeRawVal(v_2.get_payload()),
-                ))
+                let v_0 = Bytes::from_val(env, v_0);
+                let v_1 = Symbol::from_val(env, v_1);
+                let v_2 = Vec::<RawVal>::from_val(env, v_2);
+                TypedFuzzInstruction::Call(TypedModCall::TryCall(v_0, v_1, v_2))
             }
             TypedFuzzInstructionPrototype::ContractEvent(v_0, v_1) => {
                 let v_0 = RawVal::from_val(env, v_0);
