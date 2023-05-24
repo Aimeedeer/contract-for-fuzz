@@ -1,8 +1,8 @@
 use core::mem;
-use soroban_env_common::{U32Val, AddressObject, BytesObject, SymbolObject};
+use soroban_env_common::{U32Val, BytesObject, I64Object, I128Object, I256Object, U64Object, U128Object, U256Object};
 use soroban_sdk::contracttype;
 use crate::{FakeRawVal, syscalls};
-use soroban_sdk::{Address, Bytes, RawVal, Symbol, Vec};
+use soroban_sdk::{Address, Bytes, RawVal, Symbol, Vec, String, Map};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -69,8 +69,8 @@ pub enum TypedModCall {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModContext {
-    ContractEvent(FakeRawVal, FakeRawVal),
-    FailWithStatus(FakeRawVal),
+    ContractEvent(Vec<RawVal>, FakeRawVal),
+//    FailWithStatus(soroban_sdk::Status),
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -79,7 +79,7 @@ pub enum TypedModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
-    LogFmtValues(FakeRawVal, FakeRawVal),
+    LogFmtValues(String, Vec<RawVal>),
     LogValue(FakeRawVal),
     ObjCmp(FakeRawVal, FakeRawVal),
 }
@@ -87,8 +87,8 @@ pub enum TypedModContext {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModCrypto {
-    ComputeHashSha256(FakeRawVal),
-    VerifySigEd25519(FakeRawVal, FakeRawVal, FakeRawVal),
+    ComputeHashSha256(Bytes),
+    VerifySigEd25519(Bytes, Bytes, Bytes),
 }
 
 #[contracttype]
@@ -119,21 +119,21 @@ pub enum TypedModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModLedger {
-    CreateContractFromContract(FakeRawVal, FakeRawVal),
+    CreateContractFromContract(Bytes, Bytes),
     DelContractData(FakeRawVal),
     GetContractData(FakeRawVal),
     HasContractData(FakeRawVal),
     PutContractData(FakeRawVal, FakeRawVal),
-    UpdateCurrentContractWasm(FakeRawVal),
+    UpdateCurrentContractWasm(Bytes),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModMap {
-    MapDel(FakeRawVal, FakeRawVal),
-    MapGet(FakeRawVal, FakeRawVal),
-    MapHas(FakeRawVal, FakeRawVal),
-    MapKeys(FakeRawVal),
+    MapDel(Map<RawVal, RawVal>, FakeRawVal),
+    MapGet(Map<RawVal, RawVal>, FakeRawVal),
+    MapHas(Map<RawVal, RawVal>, FakeRawVal),
+    MapKeys(Map<RawVal, RawVal>),
     MapLen(FakeRawVal),
     MapMaxKey(FakeRawVal),
     MapMinKey(FakeRawVal),
@@ -354,20 +354,20 @@ impl TypedFuzzInstruction {
                     let v_1 = v_1.to_val();
                     let v_2 = v_2.to_object();
 
-                    syscalls::call::call(v_0, v_1, v_2);
+                    syscalls::call::try_call(v_0, v_1, v_2);
                 },
             },
             Context(v) => match v {
                 TypedModContext::ContractEvent(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
 
                     syscalls::context::contract_event(v_0, v_1);
                 },
-                TypedModContext::FailWithStatus(v) => unsafe {
-                    let v = mem::transmute(v.0);
+/*                TypedModContext::FailWithStatus(v) => unsafe {
+                    let v = Status::from(v);
                     syscalls::context::fail_with_status(v);
-                },
+                },*/
                 TypedModContext::GetCurrentCallStack => unsafe {
                     syscalls::context::get_current_call_stack();
                 },
@@ -393,8 +393,8 @@ impl TypedFuzzInstruction {
                     syscalls::context::get_ledger_version();
                 },
                 TypedModContext::LogFmtValues(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_0 = v_0.to_object();
+                    let v_1 = v_1.to_object();
                     syscalls::context::log_fmt_values(v_0, v_1);
                 },
                 TypedModContext::LogValue(v) => unsafe {
@@ -409,13 +409,13 @@ impl TypedFuzzInstruction {
             },
             Crypto(v) => match v {
                 TypedModCrypto::ComputeHashSha256(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = BytesObject::from(v);
                     syscalls::crypto::compute_hash_sha256(v);
                 },
                 TypedModCrypto::VerifySigEd25519(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_0 = BytesObject::from(v_0);
+                    let v_1 = BytesObject::from(v_1);
+                    let v_2 = BytesObject::from(v_2);
                     syscalls::crypto::verify_sig_ed25519(v_0, v_1, v_2);
                 },
             },
@@ -439,66 +439,67 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_from_u256_pieces(v_0, v_1, v_2, v_3);
                 },
                 TypedModInt::ObjToI64(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    // todo
+                    let v = I64Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i64(v);
                 },
                 TypedModInt::ObjToI128Hi64(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I128Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i128_hi64(v);
                 },
                 TypedModInt::ObjToI128Lo64(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I128Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i128_lo64(v);
                 },
                 TypedModInt::ObjToI256HiHi(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i256_hi_hi(v);
                 },
                 TypedModInt::ObjToI256HiLo(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i256_hi_lo(v);
                 },
                 TypedModInt::ObjToI256LoHi(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i256_lo_hi(v);
                 },
                 TypedModInt::ObjToI256LoLo(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i256_lo_lo(v);
                 },
                 TypedModInt::ObjToU64(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = U64Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_u64(v);
                 },
                 TypedModInt::ObjToU128Hi64(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = U128Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_u128_hi64(v);
                 },
                 TypedModInt::ObjToU128Lo64(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = I128Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_i128_lo64(v);
                 },
                 TypedModInt::ObjToU256HiHi(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = U256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_u256_hi_hi(v);
                 },
                 TypedModInt::ObjToU256HiLo(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = U256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_u256_hi_lo(v);
                 },
                 TypedModInt::ObjToU256LoHi(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = U256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_u256_lo_hi(v);
                 },
                 TypedModInt::ObjToU256LoLo(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = U256Object::from(mem::transmute(v.0));
                     syscalls::int::obj_to_u256_lo_lo(v);
                 },
             },
             Ledger(v) => match v {
                 TypedModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_0 = BytesObject::from(v_0);
+                    let v_1 = BytesObject::from(v_1);
                     syscalls::ledger::create_contract_from_contract(v_0, v_1);
                 },
                 TypedModLedger::DelContractData(v) => unsafe {
@@ -519,28 +520,29 @@ impl TypedFuzzInstruction {
                     syscalls::ledger::put_contract_data(v_0, v_1);
                 },
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = BytesObject::from(v);
                     syscalls::ledger::update_current_contract_wasm(v);
                 },
             },
             Map(v) => match v {
                 TypedModMap::MapDel(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    // todo: private method
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::map::map_del(v_0, v_1);
                 },
                 TypedModMap::MapGet(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::map::map_get(v_0, v_1);
                 },
                 TypedModMap::MapHas(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::map::map_has(v_0, v_1);
                 },
                 TypedModMap::MapKeys(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::map::map_keys(v);
                 },
                 TypedModMap::MapLen(v) => unsafe {
