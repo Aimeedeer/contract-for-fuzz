@@ -1,8 +1,10 @@
+use crate::{syscalls, FakeRawVal};
 use core::mem;
-use soroban_env_common::{U32Val, BytesObject, I64Object, I128Object, I256Object, U64Object, U128Object, U256Object};
+use soroban_env_common::{
+    BytesObject, I128Object, I256Object, I64Object, U128Object, U256Object, U32Val, U64Object,
+};
 use soroban_sdk::contracttype;
-use crate::{FakeRawVal, syscalls};
-use soroban_sdk::{Address, Bytes, RawVal, Symbol, Vec, String, Map};
+use soroban_sdk::{Address, Bytes, Map, RawVal, String, Symbol, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -70,7 +72,7 @@ pub enum TypedModCall {
 #[derive(Clone, Debug)]
 pub enum TypedModContext {
     ContractEvent(Vec<RawVal>, FakeRawVal),
-//    FailWithStatus(soroban_sdk::Status),
+    //    FailWithStatus(soroban_sdk::Status),
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -169,7 +171,6 @@ pub enum TypedModVec {
     VecSlice(FakeRawVal, u32, u32),
     VecUnpackToLinearMemory(FakeRawVal, u32, u32),
 }
-
 
 impl TypedFuzzInstruction {
     pub fn run(self) {
@@ -364,7 +365,7 @@ impl TypedFuzzInstruction {
 
                     syscalls::context::contract_event(v_0, v_1);
                 },
-/*                TypedModContext::FailWithStatus(v) => unsafe {
+                /*                TypedModContext::FailWithStatus(v) => unsafe {
                     let v = Status::from(v);
                     syscalls::context::fail_with_status(v);
                 },*/

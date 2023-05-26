@@ -1,7 +1,7 @@
+use crate::{syscalls, FakeRawVal};
 use core::mem;
 use soroban_env_common::U32Val;
 use soroban_sdk::contracttype;
-use crate::{FakeRawVal, syscalls};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -168,7 +168,6 @@ pub enum RawModVec {
     VecSlice(FakeRawVal, u32, u32),
     VecUnpackToLinearMemory(FakeRawVal, u32, u32),
 }
-
 
 impl RawFuzzInstruction {
     pub fn run(self) {
