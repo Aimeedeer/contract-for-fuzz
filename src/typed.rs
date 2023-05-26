@@ -136,16 +136,16 @@ pub enum TypedModMap {
     MapGet(Map<RawVal, RawVal>, FakeRawVal),
     MapHas(Map<RawVal, RawVal>, FakeRawVal),
     MapKeys(Map<RawVal, RawVal>),
-    MapLen(FakeRawVal),
-    MapMaxKey(FakeRawVal),
-    MapMinKey(FakeRawVal),
+    MapLen(Map<RawVal, RawVal>),
+    MapMaxKey(Map<RawVal, RawVal>),
+    MapMinKey(Map<RawVal, RawVal>),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
-    MapNextKey(FakeRawVal, FakeRawVal),
-    MapPrevKey(FakeRawVal, FakeRawVal),
-    MapPut(FakeRawVal, FakeRawVal, FakeRawVal),
-    MapUnpackToLinearMemory(FakeRawVal, u32, u32, u32),
-    MapValues(FakeRawVal),
+    MapNextKey(Map<RawVal, RawVal>, FakeRawVal),
+    MapPrevKey(Map<RawVal, RawVal>, FakeRawVal),
+    MapPut(Map<RawVal, RawVal>, FakeRawVal, FakeRawVal),
+    MapUnpackToLinearMemory(Map<RawVal, RawVal>, u32, u32, u32),
+    MapValues(Map<RawVal, RawVal>),
 }
 
 #[contracttype]
@@ -547,15 +547,15 @@ impl TypedFuzzInstruction {
                     syscalls::map::map_keys(v);
                 },
                 TypedModMap::MapLen(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::map::map_len(v);
                 },
                 TypedModMap::MapMaxKey(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::map::map_max_key(v);
                 },
                 TypedModMap::MapMinKey(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::map::map_min_key(v);
                 },
                 TypedModMap::MapNew => unsafe {
@@ -568,23 +568,23 @@ impl TypedFuzzInstruction {
                     syscalls::map::map_new_from_linear_memory(v_0, v_1, v_2);
                 },
                 TypedModMap::MapNextKey(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::map::map_next_key(v_0, v_1);
                 },
                 TypedModMap::MapPrevKey(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::map::map_prev_key(v_0, v_1);
                 },
                 TypedModMap::MapPut(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     let v_2 = mem::transmute(v_2.0);
                     syscalls::map::map_put(v_0, v_1, v_2);
                 },
                 TypedModMap::MapUnpackToLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     let v_3 = U32Val::from(v_3);
@@ -592,7 +592,7 @@ impl TypedFuzzInstruction {
                     syscalls::map::map_unpack_to_linear_memory(v_0, v_1, v_2, v_3);
                 },
                 TypedModMap::MapValues(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::map::map_values(v);
                 },
             },

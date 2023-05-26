@@ -198,29 +198,29 @@ pub enum TypedFuzzInstructionPrototype {
     MapGet(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
     MapHas(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
     MapKeys(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype),
-    MapLen(<RawVal as SorobanArbitrary>::Prototype),
-    MapMaxKey(<RawVal as SorobanArbitrary>::Prototype),
-    MapMinKey(<RawVal as SorobanArbitrary>::Prototype),
+    MapLen(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype),
+    MapMaxKey(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype),
+    MapMinKey(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype),
     MapNew,
     MapNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    MapNextKey(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
-    MapPrevKey(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+    MapNextKey(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+    MapPrevKey(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
     MapPut(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Map<RawVal, RawVal> as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
     MapUnpackToLinearMemory(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Map<RawVal, RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    MapValues(<RawVal as SorobanArbitrary>::Prototype),
+    MapValues(<Map<RawVal, RawVal> as SorobanArbitrary>::Prototype),
 
     Test,
 
@@ -641,16 +641,16 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Map(TypedModMap::MapKeys(v))
             }
             TypedFuzzInstructionPrototype::MapLen(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Map(TypedModMap::MapLen(FakeRawVal(v.get_payload())))
+                let v = Map::<RawVal, RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Map(TypedModMap::MapLen(v))
             }
             TypedFuzzInstructionPrototype::MapMaxKey(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Map(TypedModMap::MapMaxKey(FakeRawVal(v.get_payload())))
+                let v = Map::<RawVal, RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Map(TypedModMap::MapMaxKey(v))
             }
             TypedFuzzInstructionPrototype::MapMinKey(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Map(TypedModMap::MapMinKey(FakeRawVal(v.get_payload())))
+                let v = Map::<RawVal, RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Map(TypedModMap::MapMinKey(v))
             }
             TypedFuzzInstructionPrototype::MapNew => {
                 TypedFuzzInstruction::Map(TypedModMap::MapNew)
@@ -659,43 +659,43 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Map(TypedModMap::MapNewFromLinearMemory(*v_0, *v_1, *v_2))
             }
             TypedFuzzInstructionPrototype::MapNextKey(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Map(TypedModMap::MapNextKey(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::MapPrevKey(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Map(TypedModMap::MapPrevKey(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::MapPut(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 let v_2 = RawVal::from_val(env, v_2);
                 TypedFuzzInstruction::Map(TypedModMap::MapPut(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                     FakeRawVal(v_2.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::MapUnpackToLinearMemory(v_0, v_1, v_2, v_3) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                 TypedFuzzInstruction::Map(TypedModMap::MapUnpackToLinearMemory(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                     *v_2,
                     *v_3,
                 ))
             }
             TypedFuzzInstructionPrototype::MapValues(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Map(TypedModMap::MapValues(FakeRawVal(v.get_payload())))
+                let v = Map::<RawVal, RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Map(TypedModMap::MapValues(v))
             }
             TypedFuzzInstructionPrototype::Test => {
                 TypedFuzzInstruction::Test
