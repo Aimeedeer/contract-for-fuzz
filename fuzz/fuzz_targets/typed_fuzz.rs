@@ -225,64 +225,64 @@ pub enum TypedFuzzInstructionPrototype {
     Test,
 
     VecAppend(
-        <RawVal as SorobanArbitrary>::Prototype,
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
     ),
-    VecBack(<RawVal as SorobanArbitrary>::Prototype),
+    VecBack(<Vec<RawVal> as SorobanArbitrary>::Prototype),
     VecBinarySearch(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
     VecDel(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     VecFirstIndexOf(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
-    VecFront(<RawVal as SorobanArbitrary>::Prototype),
+    VecFront(<Vec<RawVal> as SorobanArbitrary>::Prototype),
     VecGet(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     VecInsert(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
     VecLastIndexOf(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
-    VecLen(<RawVal as SorobanArbitrary>::Prototype),
+    VecLen(<Vec<RawVal> as SorobanArbitrary>::Prototype),
     VecNew(<RawVal as SorobanArbitrary>::Prototype),
     VecNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    VecPopBack(<RawVal as SorobanArbitrary>::Prototype),
-    VecPopFront(<RawVal as SorobanArbitrary>::Prototype),
+    VecPopBack(<Vec<RawVal> as SorobanArbitrary>::Prototype),
+    VecPopFront(<Vec<RawVal> as SorobanArbitrary>::Prototype),
     VecPushBack(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
     VecPushFront(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
     VecPut(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
     ),
     VecSlice(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     VecUnpackToLinearMemory(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Vec<RawVal> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
@@ -701,75 +701,68 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Test
             }
             TypedFuzzInstructionPrototype::VecAppend(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                let v_1 = RawVal::from_val(env, v_1);
-                TypedFuzzInstruction::Vec(TypedModVec::VecAppend(
-                    FakeRawVal(v_0.get_payload()),
-                    FakeRawVal(v_1.get_payload()),
-                ))
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
+                let v_1 = Vec::<RawVal>::from_val(env, v_1);
+                TypedFuzzInstruction::Vec(TypedModVec::VecAppend(v_0, v_1))
             }
             TypedFuzzInstructionPrototype::VecBack(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Vec(TypedModVec::VecBack(FakeRawVal(v.get_payload())))
+                let v = Vec::<RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Vec(TypedModVec::VecBack(v))
             }
             TypedFuzzInstructionPrototype::VecBinarySearch(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Vec(TypedModVec::VecBinarySearch(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecDel(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 TypedFuzzInstruction::Vec(TypedModVec::VecDel(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                 ))
             }
             TypedFuzzInstructionPrototype::VecFirstIndexOf(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Vec(TypedModVec::VecFirstIndexOf(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecFront(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Vec(TypedModVec::VecFront(
-                    FakeRawVal(v.get_payload()),
-                ))
+                let v = Vec::<RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Vec(TypedModVec::VecFront(v))
             }
             TypedFuzzInstructionPrototype::VecGet(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 TypedFuzzInstruction::Vec(TypedModVec::VecGet(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                 ))
             }
             TypedFuzzInstructionPrototype::VecInsert(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_2 = RawVal::from_val(env, v_2);
                 TypedFuzzInstruction::Vec(TypedModVec::VecInsert(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                     FakeRawVal(v_2.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecLastIndexOf(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Vec(TypedModVec::VecLastIndexOf(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecLen(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Vec(TypedModVec::VecLen(
-                    FakeRawVal(v.get_payload()),
-                ))
+                let v = Vec::<RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Vec(TypedModVec::VecLen(v))
             }
             TypedFuzzInstructionPrototype::VecNew(v) => {
                 let v = RawVal::from_val(env, v);
@@ -781,54 +774,50 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Vec(TypedModVec::VecNewFromLinearMemory(*v_0, *v_1))
             }
             TypedFuzzInstructionPrototype::VecPopBack(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Vec(TypedModVec::VecPopBack(
-                    FakeRawVal(v.get_payload()),
-                ))
+                let v = Vec::<RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Vec(TypedModVec::VecPopBack(v))
             }
             TypedFuzzInstructionPrototype::VecPopFront(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Vec(TypedModVec::VecPopFront(
-                    FakeRawVal(v.get_payload()),
-                ))
+                let v = Vec::<RawVal>::from_val(env, v);
+                TypedFuzzInstruction::Vec(TypedModVec::VecPopFront(v))
             }
             TypedFuzzInstructionPrototype::VecPushBack(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Vec(TypedModVec::VecPushBack(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecPushFront(v_0, v_1) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
                 TypedFuzzInstruction::Vec(TypedModVec::VecPushFront(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     FakeRawVal(v_1.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecPut(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 let v_2 = RawVal::from_val(env, v_2);
                 TypedFuzzInstruction::Vec(TypedModVec::VecPut(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                     FakeRawVal(v_2.get_payload()),
                 ))
             }
             TypedFuzzInstructionPrototype::VecSlice(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 TypedFuzzInstruction::Vec(TypedModVec::VecSlice(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                     *v_2,
                 ))
             }
             TypedFuzzInstructionPrototype::VecUnpackToLinearMemory(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
+                let v_0 = Vec::<RawVal>::from_val(env, v_0);
                 TypedFuzzInstruction::Vec(TypedModVec::VecUnpackToLinearMemory(
-                    FakeRawVal(v_0.get_payload()),
+                    v_0,
                     *v_1,
                     *v_2,
                 ))

@@ -151,25 +151,25 @@ pub enum TypedModMap {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModVec {
-    VecAppend(FakeRawVal, FakeRawVal),
-    VecBack(FakeRawVal),
-    VecBinarySearch(FakeRawVal, FakeRawVal),
-    VecDel(FakeRawVal, u32),
-    VecFirstIndexOf(FakeRawVal, FakeRawVal),
-    VecFront(FakeRawVal),
-    VecGet(FakeRawVal, u32),
-    VecInsert(FakeRawVal, u32, FakeRawVal),
-    VecLastIndexOf(FakeRawVal, FakeRawVal),
-    VecLen(FakeRawVal),
+    VecAppend(Vec<RawVal>, Vec<RawVal>),
+    VecBack(Vec<RawVal>),
+    VecBinarySearch(Vec<RawVal>, FakeRawVal),
+    VecDel(Vec<RawVal>, u32),
+    VecFirstIndexOf(Vec<RawVal>, FakeRawVal),
+    VecFront(Vec<RawVal>),
+    VecGet(Vec<RawVal>, u32),
+    VecInsert(Vec<RawVal>, u32, FakeRawVal),
+    VecLastIndexOf(Vec<RawVal>, FakeRawVal),
+    VecLen(Vec<RawVal>),
     VecNew(FakeRawVal),
     VecNewFromLinearMemory(u32, u32),
-    VecPopBack(FakeRawVal),
-    VecPopFront(FakeRawVal),
-    VecPushBack(FakeRawVal, FakeRawVal),
-    VecPushFront(FakeRawVal, FakeRawVal),
-    VecPut(FakeRawVal, u32, FakeRawVal),
-    VecSlice(FakeRawVal, u32, u32),
-    VecUnpackToLinearMemory(FakeRawVal, u32, u32),
+    VecPopBack(Vec<RawVal>),
+    VecPopFront(Vec<RawVal>),
+    VecPushBack(Vec<RawVal>, FakeRawVal),
+    VecPushFront(Vec<RawVal>, FakeRawVal),
+    VecPut(Vec<RawVal>, u32, FakeRawVal),
+    VecSlice(Vec<RawVal>, u32, u32),
+    VecUnpackToLinearMemory(Vec<RawVal>, u32, u32),
 }
 
 impl TypedFuzzInstruction {
@@ -601,51 +601,51 @@ impl TypedFuzzInstruction {
             },
             Vec(v) => match v {
                 TypedModVec::VecAppend(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_0 = v_0.to_object();
+                    let v_1 = v_1.to_object();
                     syscalls::vec::vec_append(v_0, v_1);
                 },
                 TypedModVec::VecBack(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::vec::vec_back(v);
                 },
                 TypedModVec::VecBinarySearch(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::vec::vec_binary_search(v_0, v_1);
                 },
                 TypedModVec::VecDel(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     syscalls::vec::vec_del(v_0, v_1);
                 },
                 TypedModVec::VecFirstIndexOf(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::vec::vec_first_index_of(v_0, v_1);
                 },
                 TypedModVec::VecFront(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::vec::vec_front(v);
                 },
                 TypedModVec::VecGet(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     syscalls::vec::vec_get(v_0, v_1);
                 },
                 TypedModVec::VecInsert(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = mem::transmute(v_2.0);
                     syscalls::vec::vec_insert(v_0, v_1, v_2);
                 },
                 TypedModVec::VecLastIndexOf(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::vec::vec_last_index_of(v_0, v_1);
                 },
                 TypedModVec::VecLen(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::vec::vec_len(v);
                 },
                 TypedModVec::VecNew(v) => unsafe {
@@ -658,37 +658,37 @@ impl TypedFuzzInstruction {
                     syscalls::vec::vec_new_from_linear_memory(v_0, v_1);
                 },
                 TypedModVec::VecPopBack(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::vec::vec_pop_back(v);
                 },
                 TypedModVec::VecPopFront(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_object();
                     syscalls::vec::vec_pop_front(v);
                 },
                 TypedModVec::VecPushBack(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::vec::vec_push_back(v_0, v_1);
                 },
                 TypedModVec::VecPushFront(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::vec::vec_push_front(v_0, v_1);
                 },
                 TypedModVec::VecPut(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = mem::transmute(v_2.0);
                     syscalls::vec::vec_put(v_0, v_1, v_2);
                 },
                 TypedModVec::VecSlice(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     syscalls::vec::vec_slice(v_0, v_1, v_2);
                 },
                 TypedModVec::VecUnpackToLinearMemory(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     syscalls::vec::vec_unpack_to_linear_memory(v_0, v_1, v_2);
