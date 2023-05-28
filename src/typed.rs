@@ -102,7 +102,7 @@ pub enum TypedModInt {
     ObjFromU64(u64),
     ObjFromU128Pieces(u64, u64),
     ObjFromU256Pieces(u64, u64, u64, u64),
-    ObjToI64(FakeRawVal),
+    ObjToI64(i64),
     ObjToI128Hi64(FakeRawVal),
     ObjToI128Lo64(FakeRawVal),
     ObjToI256HiHi(FakeRawVal),
@@ -441,7 +441,7 @@ impl TypedFuzzInstruction {
                 },
                 TypedModInt::ObjToI64(v) => unsafe {
                     // todo
-                    let v = I64Object::from(mem::transmute(v.0));
+                    let v = syscalls::int::obj_from_i64(v);
                     syscalls::int::obj_to_i64(v);
                 },
                 TypedModInt::ObjToI128Hi64(v) => unsafe {
