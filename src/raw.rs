@@ -474,7 +474,7 @@ impl RawFuzzInstruction {
                 },
                 RawModInt::ObjToU128Lo64(v) => unsafe {
                     let v = mem::transmute(v.0);
-                    syscalls::int::obj_to_i128_lo64(v);
+                    syscalls::int::obj_to_u128_lo64(v);
                 },
                 RawModInt::ObjToU256HiHi(v) => unsafe {
                     let v = mem::transmute(v.0);

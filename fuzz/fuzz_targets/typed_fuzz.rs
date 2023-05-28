@@ -170,15 +170,15 @@ pub enum TypedFuzzInstructionPrototype {
         <u64 as SorobanArbitrary>::Prototype,
     ),
     ObjToI64(<i64 as SorobanArbitrary>::Prototype),
-    ObjToI128Hi64(<RawVal as SorobanArbitrary>::Prototype),
-    ObjToI128Lo64(<RawVal as SorobanArbitrary>::Prototype),
+    ObjToI128Hi64(<i128 as SorobanArbitrary>::Prototype),
+    ObjToI128Lo64(<i128 as SorobanArbitrary>::Prototype),
     ObjToI256HiHi(<RawVal as SorobanArbitrary>::Prototype),
     ObjToI256HiLo(<RawVal as SorobanArbitrary>::Prototype),
     ObjToI256LoHi(<RawVal as SorobanArbitrary>::Prototype),
     ObjToI256LoLo(<RawVal as SorobanArbitrary>::Prototype),
-    ObjToU64(<RawVal as SorobanArbitrary>::Prototype),
-    ObjToU128Hi64(<RawVal as SorobanArbitrary>::Prototype),
-    ObjToU128Lo64(<RawVal as SorobanArbitrary>::Prototype),
+    ObjToU64(<u64 as SorobanArbitrary>::Prototype),
+    ObjToU128Hi64(<u128 as SorobanArbitrary>::Prototype),
+    ObjToU128Lo64(<u128 as SorobanArbitrary>::Prototype),
     ObjToU256HiHi(<RawVal as SorobanArbitrary>::Prototype),
     ObjToU256HiLo(<RawVal as SorobanArbitrary>::Prototype),
     ObjToU256LoHi(<RawVal as SorobanArbitrary>::Prototype),
@@ -528,15 +528,13 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Int(TypedModInt::ObjFromU256Pieces(*v_0, *v_1, *v_2, *v_3))
             }
             TypedFuzzInstructionPrototype::ObjToI64(v) => {
-                 TypedFuzzInstruction::Int(TypedModInt::ObjToI64(*v))
+                TypedFuzzInstruction::Int(TypedModInt::ObjToI64(*v))
             }
             TypedFuzzInstructionPrototype::ObjToI128Hi64(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Int(TypedModInt::ObjToI128Hi64(FakeRawVal(v.get_payload())))
+                TypedFuzzInstruction::Int(TypedModInt::ObjToI128Hi64(*v))
             }
             TypedFuzzInstructionPrototype::ObjToI128Lo64(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Int(TypedModInt::ObjToI128Lo64(FakeRawVal(v.get_payload())))
+                TypedFuzzInstruction::Int(TypedModInt::ObjToI128Lo64(*v))
             }
             TypedFuzzInstructionPrototype::ObjToI256HiHi(v) => {
                 let v = RawVal::from_val(env, v);
@@ -555,16 +553,13 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoLo(FakeRawVal(v.get_payload())))
             }
             TypedFuzzInstructionPrototype::ObjToU64(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Int(TypedModInt::ObjToU64(FakeRawVal(v.get_payload())))
+                TypedFuzzInstruction::Int(TypedModInt::ObjToU64(*v))
             }
             TypedFuzzInstructionPrototype::ObjToU128Hi64(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Int(TypedModInt::ObjToU128Hi64(FakeRawVal(v.get_payload())))
+                TypedFuzzInstruction::Int(TypedModInt::ObjToU128Hi64(*v))
             }
             TypedFuzzInstructionPrototype::ObjToU128Lo64(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Int(TypedModInt::ObjToU128Lo64(FakeRawVal(v.get_payload())))
+                TypedFuzzInstruction::Int(TypedModInt::ObjToU128Lo64(*v))
             }
             TypedFuzzInstructionPrototype::ObjToU256HiHi(v) => {
                 let v = RawVal::from_val(env, v);

@@ -4,7 +4,7 @@ use soroban_env_common::{
     BytesObject, I128Object, I256Object, I64Object, U128Object, U256Object, U32Val, U64Object,
 };
 use soroban_sdk::contracttype;
-use soroban_sdk::{Address, Bytes, Map, RawVal, String, Symbol, Vec};
+use soroban_sdk::{Address, Bytes, Env, Map, RawVal, String, Symbol, TryFromVal, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -72,6 +72,7 @@ pub enum TypedModCall {
 #[derive(Clone, Debug)]
 pub enum TypedModContext {
     ContractEvent(Vec<RawVal>, FakeRawVal),
+    // todo
     //    FailWithStatus(soroban_sdk::Status),
     GetCurrentCallStack,
     GetCurrentContractAddress,
@@ -103,15 +104,15 @@ pub enum TypedModInt {
     ObjFromU128Pieces(u64, u64),
     ObjFromU256Pieces(u64, u64, u64, u64),
     ObjToI64(i64),
-    ObjToI128Hi64(FakeRawVal),
-    ObjToI128Lo64(FakeRawVal),
+    ObjToI128Hi64(i128),
+    ObjToI128Lo64(i128),
     ObjToI256HiHi(FakeRawVal),
     ObjToI256HiLo(FakeRawVal),
     ObjToI256LoHi(FakeRawVal),
     ObjToI256LoLo(FakeRawVal),
-    ObjToU64(FakeRawVal),
-    ObjToU128Hi64(FakeRawVal),
-    ObjToU128Lo64(FakeRawVal),
+    ObjToU64(u64),
+    ObjToU128Hi64(u128),
+    ObjToU128Lo64(u128),
     ObjToU256HiHi(FakeRawVal),
     ObjToU256HiLo(FakeRawVal),
     ObjToU256LoHi(FakeRawVal),
@@ -173,7 +174,7 @@ pub enum TypedModVec {
 }
 
 impl TypedFuzzInstruction {
-    pub fn run(self) {
+    pub fn run(self, env: &Env) {
         let fuzz_instruction = self;
         use TypedFuzzInstruction::*;
         match fuzz_instruction {
@@ -440,16 +441,18 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_from_u256_pieces(v_0, v_1, v_2, v_3);
                 },
                 TypedModInt::ObjToI64(v) => unsafe {
-                    // todo
-                    let v = syscalls::int::obj_from_i64(v);
+                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = I64Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i64(v);
                 },
                 TypedModInt::ObjToI128Hi64(v) => unsafe {
-                    let v = I128Object::from(mem::transmute(v.0));
+                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = I128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i128_hi64(v);
                 },
                 TypedModInt::ObjToI128Lo64(v) => unsafe {
-                    let v = I128Object::from(mem::transmute(v.0));
+                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = I128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i128_lo64(v);
                 },
                 TypedModInt::ObjToI256HiHi(v) => unsafe {
@@ -469,16 +472,19 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_to_i256_lo_lo(v);
                 },
                 TypedModInt::ObjToU64(v) => unsafe {
-                    let v = U64Object::from(mem::transmute(v.0));
+                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = U64Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u64(v);
                 },
                 TypedModInt::ObjToU128Hi64(v) => unsafe {
-                    let v = U128Object::from(mem::transmute(v.0));
+                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = U128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u128_hi64(v);
                 },
                 TypedModInt::ObjToU128Lo64(v) => unsafe {
-                    let v = I128Object::from(mem::transmute(v.0));
-                    syscalls::int::obj_to_i128_lo64(v);
+                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = U128Object::try_from(&v).unwrap();
+                    syscalls::int::obj_to_u128_lo64(v);
                 },
                 TypedModInt::ObjToU256HiHi(v) => unsafe {
                     let v = U256Object::from(mem::transmute(v.0));

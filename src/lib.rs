@@ -34,13 +34,13 @@ pub struct FuzzContract;
 
 #[contractimpl]
 impl FuzzContract {
-    pub fn run(_env: Env, fuzz_instruction: FuzzInstruction) {
+    pub fn run(env: Env, fuzz_instruction: FuzzInstruction) {
         match fuzz_instruction {
             FuzzInstruction::Raw(instr) => {
                 instr.run();
             }
             FuzzInstruction::Typed(instr) => {
-                instr.run();
+                instr.run(&env);
             }
         }
     }
