@@ -1,7 +1,7 @@
 use crate::{syscalls, FakeRawVal};
 use core::mem;
 use soroban_env_common::{
-    BytesObject, I128Object, I256Object, I64Object, U128Object, U256Object, U32Val, U64Object,
+    BytesObject, I128Object, I256Object, I64Object, U128Object, U256Object, U32Val, U64Object, SymbolObject,
 };
 use soroban_sdk::contracttype;
 use soroban_sdk::{Address, Bytes, Env, Map, RawVal, String, Symbol, TryFromVal, Vec};
@@ -52,12 +52,12 @@ pub enum TypedModBuf {
     BytesSlice(Bytes, u32, u32),
     DeserializeFromBytes(Bytes),
     SerializeToBytes(FakeRawVal),
-    StringCopyToLinearMemory(FakeRawVal, u32, u32, u32),
-    StringLen(FakeRawVal),
+    StringCopyToLinearMemory(String, u32, u32, u32),
+    StringLen(String),
     StringNewFromLinearMemory(u32, u32),
-    SymbolCopyToLinearMemory(FakeRawVal, u32, u32, u32),
-    SymbolIndexInLinearMemory(FakeRawVal, u32, u32),
-    SymbolLen(FakeRawVal),
+    SymbolCopyToLinearMemory(Symbol, u32, u32, u32),
+    SymbolIndexInLinearMemory(Symbol, u32, u32),
+    SymbolLen(Symbol),
     SymbolNewFromLinearMemory(u32, u32),
 }
 
@@ -300,7 +300,7 @@ impl TypedFuzzInstruction {
                     syscalls::buf::serialize_to_bytes(v);
                 },
                 TypedModBuf::StringCopyToLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     let v_3 = U32Val::from(v_3);
@@ -308,7 +308,7 @@ impl TypedFuzzInstruction {
                     syscalls::buf::string_copy_to_linear_memory(v_0, v_1, v_2, v_3);
                 },
                 TypedModBuf::StringLen(v_0) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_object();
                     syscalls::buf::string_len(v_0);
                 },
                 TypedModBuf::StringNewFromLinearMemory(v_0, v_1) => unsafe {
@@ -318,7 +318,8 @@ impl TypedFuzzInstruction {
                     syscalls::buf::string_new_from_linear_memory(v_0, v_1);
                 },
                 TypedModBuf::SymbolCopyToLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_val();
+                    let v_0 = SymbolObject::try_from(v_0).unwrap();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     let v_3 = U32Val::from(v_3);
@@ -326,14 +327,15 @@ impl TypedFuzzInstruction {
                     syscalls::buf::symbol_copy_to_linear_memory(v_0, v_1, v_2, v_3);
                 },
                 TypedModBuf::SymbolIndexInLinearMemory(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    let v_0 = v_0.to_val();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
 
                     syscalls::buf::symbol_index_in_linear_memory(v_0, v_1, v_2);
                 },
                 TypedModBuf::SymbolLen(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = v.to_val();
+                    let v = SymbolObject::try_from(v).unwrap();
                     syscalls::buf::symbol_len(v);
                 },
                 TypedModBuf::SymbolNewFromLinearMemory(v_0, v_1) => unsafe {

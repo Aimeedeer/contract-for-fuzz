@@ -77,30 +77,30 @@ pub enum TypedFuzzInstructionPrototype {
     DeserializeFromBytes(<Bytes as SorobanArbitrary>::Prototype),
     SerializeToBytes(<RawVal as SorobanArbitrary>::Prototype),
     StringCopyToLinearMemory(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <String as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     StringLen(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <String as SorobanArbitrary>::Prototype,
     ),
     StringNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     SymbolCopyToLinearMemory(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Symbol as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     SymbolIndexInLinearMemory(
-        <RawVal as SorobanArbitrary>::Prototype,
+        <Symbol as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    SymbolLen(<RawVal as SorobanArbitrary>::Prototype),
+    SymbolLen(<Symbol as SorobanArbitrary>::Prototype),
     SymbolNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -412,27 +412,27 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Buf(TypedModBuf::SerializeToBytes(FakeRawVal(v.get_payload())))
             }
             TypedFuzzInstructionPrototype::StringCopyToLinearMemory(v_0, v_1, v_2, v_3) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                TypedFuzzInstruction::Buf(TypedModBuf::StringCopyToLinearMemory(FakeRawVal(v_0.get_payload()), *v_1, *v_2, *v_3))
+                let v_0 = String::from_val(env, v_0);
+                TypedFuzzInstruction::Buf(TypedModBuf::StringCopyToLinearMemory(v_0, *v_1, *v_2, *v_3))
             }
             TypedFuzzInstructionPrototype::StringLen(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Buf(TypedModBuf::StringLen(FakeRawVal(v.get_payload())))
+                let v = String::from_val(env, v);
+                TypedFuzzInstruction::Buf(TypedModBuf::StringLen(v))
             }
             TypedFuzzInstructionPrototype::StringNewFromLinearMemory(v_0, v_1) => {
                 TypedFuzzInstruction::Buf(TypedModBuf::StringNewFromLinearMemory(*v_0, *v_1))
             }
             TypedFuzzInstructionPrototype::SymbolCopyToLinearMemory(v_0, v_1, v_2, v_3) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                TypedFuzzInstruction::Buf(TypedModBuf::SymbolCopyToLinearMemory(FakeRawVal(v_0.get_payload()), *v_1, *v_2, *v_3))
+                let v_0 = Symbol::from_val(env, v_0);
+                TypedFuzzInstruction::Buf(TypedModBuf::SymbolCopyToLinearMemory(v_0, *v_1, *v_2, *v_3))
             }
             TypedFuzzInstructionPrototype::SymbolIndexInLinearMemory(v_0, v_1, v_2) => {
-                let v_0 = RawVal::from_val(env, v_0);
-                TypedFuzzInstruction::Buf(TypedModBuf::SymbolIndexInLinearMemory(FakeRawVal(v_0.get_payload()), *v_1, *v_2))
+                let v_0 = Symbol::from_val(env, v_0);
+                TypedFuzzInstruction::Buf(TypedModBuf::SymbolIndexInLinearMemory(v_0, *v_1, *v_2))
             }
             TypedFuzzInstructionPrototype::SymbolLen(v) => {
-                let v = RawVal::from_val(env, v);
-                TypedFuzzInstruction::Buf(TypedModBuf::SymbolLen(FakeRawVal(v.get_payload())))
+                let v = Symbol::from_val(env, v);
+                TypedFuzzInstruction::Buf(TypedModBuf::SymbolLen(v))
             }
             TypedFuzzInstructionPrototype::SymbolNewFromLinearMemory(v_0, v_1) => {
                 TypedFuzzInstruction::Buf(TypedModBuf::SymbolNewFromLinearMemory(*v_0, *v_1))
