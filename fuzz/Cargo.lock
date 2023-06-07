@@ -307,12 +307,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
-name = "dyn-fmt"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2a0836c9bd73a9d3ca55b0effc5b1eedf96dd13ef994389bcac6d4d33c46188"
-
-[[package]]
 name = "ed25519"
 version = "1.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -443,6 +437,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e04e2fd2b8188ea827b32ef11de88377086d690286ab35747ef7f9bf3ccb590"
 
 [[package]]
+name = "intx"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6f38a50a899dc47a6d0ed5508e7f601a2e34c3a85303514b5d137f3c10a0c75"
+
+[[package]]
 name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -523,12 +523,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
-name = "memory_units"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
-
-[[package]]
 name = "miniz_oxide"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -570,18 +564,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-rational"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0638a1c9d0a3c0914158145bc76cff373a75a627e6ecbfb71cbe6f453a5a19b0"
-dependencies = [
- "autocfg",
- "num-bigint",
- "num-integer",
- "num-traits",
-]
-
-[[package]]
 name = "num-traits"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -610,6 +592,12 @@ name = "opaque-debug"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
+
+[[package]]
+name = "paste"
+version = "1.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f746c4065a8fa3fe23974dd82f15431cc8d40779821001404d10d2e79ca7d79"
 
 [[package]]
 name = "ppv-lite86"
@@ -783,6 +771,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74233d3b3b2f6d4b006dc19dee745e73e2a6bfb6f93607cd3b02bd5b00797d7c"
 
 [[package]]
+name = "smallvec"
+version = "1.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
+
+[[package]]
 name = "soroban-env-common"
 version = "0.0.16"
 dependencies = [
@@ -810,19 +804,19 @@ version = "0.0.16"
 dependencies = [
  "backtrace",
  "curve25519-dalek",
- "dyn-fmt",
  "ed25519-dalek",
  "hex",
  "log",
  "num-derive",
  "num-integer",
  "num-traits",
+ "rand",
+ "rand_chacha",
  "sha2",
  "soroban-env-common",
  "soroban-native-sdk-macros",
  "soroban-wasmi",
  "static_assertions",
- "tinyvec",
 ]
 
 [[package]]
@@ -841,10 +835,11 @@ dependencies = [
 
 [[package]]
 name = "soroban-ledger-snapshot"
-version = "0.8.0"
+version = "0.8.4"
 dependencies = [
  "serde",
  "serde_json",
+ "soroban-env-common",
  "soroban-env-host",
  "thiserror",
 ]
@@ -861,7 +856,7 @@ dependencies = [
 
 [[package]]
 name = "soroban-sdk"
-version = "0.8.0"
+version = "0.8.4"
 dependencies = [
  "arbitrary",
  "bytes-lit",
@@ -876,7 +871,7 @@ dependencies = [
 
 [[package]]
 name = "soroban-sdk-macros"
-version = "0.8.0"
+version = "0.8.4"
 dependencies = [
  "darling",
  "itertools",
@@ -891,7 +886,7 @@ dependencies = [
 
 [[package]]
 name = "soroban-spec"
-version = "0.8.0"
+version = "0.8.4"
 dependencies = [
  "base64 0.13.1",
  "darling",
@@ -911,24 +906,26 @@ dependencies = [
 
 [[package]]
 name = "soroban-wasmi"
-version = "0.16.0-soroban2"
-source = "git+https://github.com/stellar/wasmi?rev=862b32f5#862b32f53f9c6223911e79e0b0fc8592fb3bb04c"
+version = "0.30.0-soroban"
+source = "git+https://github.com/stellar/wasmi?rev=1a2bc7f#1a2bc7f3801c565c2dab22021255a164c05a7f76"
 dependencies = [
+ "intx",
+ "smallvec",
  "soroban-wasmi_core",
  "spin",
+ "wasmi_arena",
  "wasmparser-nostd",
 ]
 
 [[package]]
 name = "soroban-wasmi_core"
-version = "0.16.0-soroban2"
-source = "git+https://github.com/stellar/wasmi?rev=862b32f5#862b32f53f9c6223911e79e0b0fc8592fb3bb04c"
+version = "0.30.0-soroban"
+source = "git+https://github.com/stellar/wasmi?rev=1a2bc7f#1a2bc7f3801c565c2dab22021255a164c05a7f76"
 dependencies = [
  "downcast-rs",
  "libm",
- "memory_units",
- "num-rational",
  "num-traits",
+ "paste",
 ]
 
 [[package]]
@@ -955,7 +952,7 @@ dependencies = [
 [[package]]
 name = "stellar-xdr"
 version = "0.0.16"
-source = "git+https://github.com/stellar/rs-stellar-xdr?rev=53e1a9cf2335aff29305c72deb6f075e78915dad#53e1a9cf2335aff29305c72deb6f075e78915dad"
+source = "git+https://github.com/stellar/rs-stellar-xdr?rev=a2f370c930bb94f7bc0c9ea0426ecef3700b90a9#a2f370c930bb94f7bc0c9ea0426ecef3700b90a9"
 dependencies = [
  "arbitrary",
  "base64 0.13.1",
@@ -1056,21 +1053,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tinyvec"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87cc5ceb3875bb20c2890005a4e226a4651264a5c75edb2421b52861a0a0cb50"
-dependencies = [
- "tinyvec_macros",
-]
-
-[[package]]
-name = "tinyvec_macros"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
-
-[[package]]
 name = "typenum"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1155,6 +1137,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a901d592cafaa4d711bc324edfaff879ac700b19c3dfd60058d2b445be2691eb"
 
 [[package]]
+name = "wasmi_arena"
+version = "0.4.0"
+source = "git+https://github.com/stellar/wasmi?rev=1a2bc7f#1a2bc7f3801c565c2dab22021255a164c05a7f76"
+
+[[package]]
 name = "wasmparser"
 version = "0.88.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1165,9 +1152,9 @@ dependencies = [
 
 [[package]]
 name = "wasmparser-nostd"
-version = "0.90.0"
+version = "0.100.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92a94fbf4c521b038f41382df2056cf47099d3b7a0faa5a6e46f7771fd7c84a6"
+checksum = "9157cab83003221bfd385833ab587a039f5d6fa7304854042ba358a3b09e0724"
 dependencies = [
  "indexmap-nostd",
 ]

@@ -69,7 +69,7 @@ pub enum RawModCall {
 #[derive(Clone, Debug)]
 pub enum RawModContext {
     ContractEvent(FakeRawVal, FakeRawVal),
-    FailWithStatus(FakeRawVal),
+//    FailWithStatus(FakeRawVal),
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -78,8 +78,8 @@ pub enum RawModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
-    LogFmtValues(FakeRawVal, FakeRawVal),
-    LogValue(FakeRawVal),
+//    LogFmtValues(FakeRawVal, FakeRawVal),
+//    LogValue(FakeRawVal),
     ObjCmp(FakeRawVal, FakeRawVal),
 }
 
@@ -118,7 +118,7 @@ pub enum RawModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModLedger {
-    CreateContractFromContract(FakeRawVal, FakeRawVal),
+//    CreateContractFromContract(FakeRawVal, FakeRawVal),
     DelContractData(FakeRawVal),
     GetContractData(FakeRawVal),
     HasContractData(FakeRawVal),
@@ -362,10 +362,10 @@ impl RawFuzzInstruction {
 
                     syscalls::context::contract_event(v_0, v_1);
                 },
-                RawModContext::FailWithStatus(v) => unsafe {
+/*                RawModContext::FailWithStatus(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::context::fail_with_status(v);
-                },
+                },*/
                 RawModContext::GetCurrentCallStack => unsafe {
                     syscalls::context::get_current_call_stack();
                 },
@@ -390,7 +390,7 @@ impl RawFuzzInstruction {
                 RawModContext::GetLedgerVersion => unsafe {
                     syscalls::context::get_ledger_version();
                 },
-                RawModContext::LogFmtValues(v_0, v_1) => unsafe {
+/*                RawModContext::LogFmtValues(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::context::log_fmt_values(v_0, v_1);
@@ -398,7 +398,7 @@ impl RawFuzzInstruction {
                 RawModContext::LogValue(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::context::log_value(v);
-                },
+                },*/
                 RawModContext::ObjCmp(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
@@ -494,11 +494,11 @@ impl RawFuzzInstruction {
                 },
             },
             Ledger(v) => match v {
-                RawModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
+/*                RawModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::ledger::create_contract_from_contract(v_0, v_1);
-                },
+                },*/
                 RawModLedger::DelContractData(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::del_contract_data(v);

@@ -1,7 +1,8 @@
 use crate::{syscalls, FakeRawVal};
 use core::mem;
 use soroban_env_common::{
-    BytesObject, I128Object, I256Object, I64Object, U128Object, U256Object, U32Val, U64Object, SymbolObject,
+    BytesObject, I128Object, I256Object, I64Object, SymbolObject, U128Object, U256Object, U32Val,
+    U64Object,
 };
 use soroban_sdk::contracttype;
 use soroban_sdk::{Address, Bytes, Env, Map, RawVal, String, Symbol, TryFromVal, Vec};
@@ -64,8 +65,8 @@ pub enum TypedModBuf {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModCall {
-    Call(Bytes, Symbol, Vec<RawVal>),
-    TryCall(Bytes, Symbol, Vec<RawVal>),
+    Call(Address, Symbol, Vec<RawVal>),
+    TryCall(Address, Symbol, Vec<RawVal>),
 }
 
 #[contracttype]
@@ -82,8 +83,8 @@ pub enum TypedModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
-    LogFmtValues(String, Vec<RawVal>),
-    LogValue(FakeRawVal),
+//    LogFmtValues(String, Vec<RawVal>),
+//    LogValue(FakeRawVal),
     ObjCmp(FakeRawVal, FakeRawVal),
 }
 
@@ -122,7 +123,7 @@ pub enum TypedModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModLedger {
-    CreateContractFromContract(Bytes, Bytes),
+//    CreateContractFromContract(Bytes, Bytes),
     DelContractData(FakeRawVal),
     GetContractData(FakeRawVal),
     HasContractData(FakeRawVal),
@@ -347,14 +348,14 @@ impl TypedFuzzInstruction {
             },
             Call(v) => match v {
                 TypedModCall::Call(v_0, v_1, v_2) => unsafe {
-                    let v_0 = BytesObject::from(v_0);
+                    let v_0 = v_0.to_object();
                     let v_1 = v_1.to_val();
                     let v_2 = v_2.to_object();
 
                     syscalls::call::call(v_0, v_1, v_2);
                 },
                 TypedModCall::TryCall(v_0, v_1, v_2) => unsafe {
-                    let v_0 = BytesObject::from(v_0);
+                    let v_0 = v_0.to_object();
                     let v_1 = v_1.to_val();
                     let v_2 = v_2.to_object();
 
@@ -396,7 +397,7 @@ impl TypedFuzzInstruction {
                 TypedModContext::GetLedgerVersion => unsafe {
                     syscalls::context::get_ledger_version();
                 },
-                TypedModContext::LogFmtValues(v_0, v_1) => unsafe {
+/*                TypedModContext::LogFmtValues(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
                     let v_1 = v_1.to_object();
                     syscalls::context::log_fmt_values(v_0, v_1);
@@ -404,7 +405,7 @@ impl TypedFuzzInstruction {
                 TypedModContext::LogValue(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::context::log_value(v);
-                },
+                },*/
                 TypedModContext::ObjCmp(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
@@ -506,11 +507,11 @@ impl TypedFuzzInstruction {
                 },
             },
             Ledger(v) => match v {
-                TypedModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
+/*                TypedModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
                     let v_0 = BytesObject::from(v_0);
                     let v_1 = BytesObject::from(v_1);
                     syscalls::ledger::create_contract_from_contract(v_0, v_1);
-                },
+                },*/
                 TypedModLedger::DelContractData(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::del_contract_data(v);

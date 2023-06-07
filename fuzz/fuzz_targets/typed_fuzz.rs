@@ -2,7 +2,7 @@
 
 use libfuzzer_sys::fuzz_target;
 use soroban_sdk::{
-    Env, FromVal, RawVal, IntoVal, Symbol, Status, String, Map
+    Env, FromVal, RawVal, IntoVal, Symbol, String, Map
 };
 use soroban_sdk::{Address, Bytes, Vec};
 use fuzzcontract::*;
@@ -107,12 +107,12 @@ pub enum TypedFuzzInstructionPrototype {
     ),
 
     Call(
-        <Bytes as SorobanArbitrary>::Prototype,
+        <Address as SorobanArbitrary>::Prototype,
         <Symbol as SorobanArbitrary>::Prototype,
         <Vec<RawVal> as SorobanArbitrary>::Prototype,
     ),
     TryCall(
-        <Bytes as SorobanArbitrary>::Prototype,
+        <Address as SorobanArbitrary>::Prototype,
         <Symbol as SorobanArbitrary>::Prototype,
         <Vec<RawVal> as SorobanArbitrary>::Prototype,
     ),
@@ -130,11 +130,11 @@ pub enum TypedFuzzInstructionPrototype {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
-    LogFmtValues(
+/*    LogFmtValues(
         <String as SorobanArbitrary>::Prototype,
         <Vec<RawVal> as SorobanArbitrary>::Prototype,
     ),
-    LogValue(<RawVal as SorobanArbitrary>::Prototype),
+    LogValue(<RawVal as SorobanArbitrary>::Prototype),*/
     ObjCmp(
         <RawVal as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
@@ -184,10 +184,10 @@ pub enum TypedFuzzInstructionPrototype {
     ObjToU256LoHi(<RawVal as SorobanArbitrary>::Prototype),
     ObjToU256LoLo(<RawVal as SorobanArbitrary>::Prototype),
 
-    CreateContractFromContract(
+/*    CreateContractFromContract(
         <Bytes as SorobanArbitrary>::Prototype,
         <Bytes as SorobanArbitrary>::Prototype,
-    ),
+    ),*/
     DelContractData(<RawVal as SorobanArbitrary>::Prototype),
     GetContractData(<RawVal as SorobanArbitrary>::Prototype),
     HasContractData(<RawVal as SorobanArbitrary>::Prototype),
@@ -438,13 +438,13 @@ impl TypedFuzzInstructionPrototype {
                 TypedFuzzInstruction::Buf(TypedModBuf::SymbolNewFromLinearMemory(*v_0, *v_1))
             }
             TypedFuzzInstructionPrototype::Call(v_0, v_1, v_2) => {
-                let v_0 = Bytes::from_val(env, v_0);
+                let v_0 = Address::from_val(env, v_0);
                 let v_1 = Symbol::from_val(env, v_1);
                 let v_2 = Vec::<RawVal>::from_val(env, v_2);
                 TypedFuzzInstruction::Call(TypedModCall::Call(v_0, v_1, v_2))
             }
             TypedFuzzInstructionPrototype::TryCall(v_0, v_1, v_2) => {
-                let v_0 = Bytes::from_val(env, v_0);
+                let v_0 = Address::from_val(env, v_0);
                 let v_1 = Symbol::from_val(env, v_1);
                 let v_2 = Vec::<RawVal>::from_val(env, v_2);
                 TypedFuzzInstruction::Call(TypedModCall::TryCall(v_0, v_1, v_2))
@@ -482,7 +482,7 @@ impl TypedFuzzInstructionPrototype {
             TypedFuzzInstructionPrototype::GetLedgerVersion => {
                 TypedFuzzInstruction::Context(TypedModContext::GetLedgerVersion)
             }
-            TypedFuzzInstructionPrototype::LogFmtValues(v_0, v_1) => {
+/*            TypedFuzzInstructionPrototype::LogFmtValues(v_0, v_1) => {
                 let v_0 = String::from_val(env, v_0);
                 let v_1 = Vec::<RawVal>::from_val(env, v_1);
                 TypedFuzzInstruction::Context(TypedModContext::LogFmtValues(v_0, v_1))
@@ -490,7 +490,7 @@ impl TypedFuzzInstructionPrototype {
             TypedFuzzInstructionPrototype::LogValue(v) => {
                 let v = RawVal::from_val(env, v);
                 TypedFuzzInstruction::Context(TypedModContext::LogValue(FakeRawVal(v.get_payload())))
-            }
+            }*/
             TypedFuzzInstructionPrototype::ObjCmp(v_0, v_1) => {
                 let v_0 = RawVal::from_val(env, v_0);
                 let v_1 = RawVal::from_val(env, v_1);
@@ -577,11 +577,11 @@ impl TypedFuzzInstructionPrototype {
                 let v = RawVal::from_val(env, v);
                 TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoLo(FakeRawVal(v.get_payload())))
             }
-            TypedFuzzInstructionPrototype::CreateContractFromContract(v_0, v_1) => {
+/*            TypedFuzzInstructionPrototype::CreateContractFromContract(v_0, v_1) => {
                 let v_0 = Bytes::from_val(env, v_0);
                 let v_1 = Bytes::from_val(env, v_1);
                 TypedFuzzInstruction::Ledger(TypedModLedger::CreateContractFromContract(v_0, v_1))
-            }
+            }*/
             TypedFuzzInstructionPrototype::DelContractData(v) => {
                 let v = RawVal::from_val(env, v);
                 TypedFuzzInstruction::Ledger(TypedModLedger::DelContractData(FakeRawVal(v.get_payload())))

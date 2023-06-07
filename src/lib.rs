@@ -109,7 +109,7 @@ mod syscalls {
                 $(#[$mod_attr])*
                 pub mod $mod_id {
                     #[allow(unused_imports)]
-                    use soroban_env_common::{RawVal,Object,Symbol,Status,MapObject,VecObject,BytesObject};
+                    use soroban_env_common::{RawVal, Object, Symbol, MapObject, VecObject, BytesObject, Error};
                     #[allow(unused_imports)]
                     use soroban_env_common::{I128Object, I256Object, I64Object, I64Val, U128Object, U256Object, U32Val, U64Object, U64Val};
                     #[allow(unused_imports)]
