@@ -1,21 +1,20 @@
 #![no_main]
 
-use libfuzzer_sys::fuzz_target;
-use soroban_sdk::{
-    Env, FromVal, RawVal,
-};
 use fuzzcontract::*;
-use soroban_sdk::arbitrary::SorobanArbitrary;
+use libfuzzer_sys::fuzz_target;
 use soroban_sdk::arbitrary::arbitrary;
 use soroban_sdk::arbitrary::fuzz_catch_panic;
+use soroban_sdk::arbitrary::SorobanArbitrary;
 use soroban_sdk::testutils::Logger;
+use soroban_sdk::{Env, FromVal, RawVal};
 
 mod fuzzcontract {
-    soroban_sdk::contractimport!(file = "../target/wasm32-unknown-unknown/release/contract_for_fuzz.wasm");
+    soroban_sdk::contractimport!(
+        file = "../target/wasm32-unknown-unknown/release/contract_for_fuzz.wasm"
+    );
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawFuzzInstructionPrototype {
     Address(RawModAddressPrototype),
     Buf(RawModBufPrototype),
@@ -30,21 +29,25 @@ pub enum RawFuzzInstructionPrototype {
     Vec(RawModVecPrototype),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModAddressPrototype {
     AccountPublicKeyToAddress(<RawVal as SorobanArbitrary>::Prototype),
     AddressToAccountPublicKey(<RawVal as SorobanArbitrary>::Prototype),
     AddressToContractId(<RawVal as SorobanArbitrary>::Prototype),
     ContractIdToAddress(<RawVal as SorobanArbitrary>::Prototype),
     RequireAuth(<RawVal as SorobanArbitrary>::Prototype),
-    RequireAuthForArgs(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+    RequireAuthForArgs(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModBufPrototype {
-    BytesAppend(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+    BytesAppend(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
     BytesBack(<RawVal as SorobanArbitrary>::Prototype),
     BytesCopyFromLinearMemory(
         <RawVal as SorobanArbitrary>::Prototype,
@@ -101,9 +104,7 @@ pub enum RawModBufPrototype {
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    StringLen(
-        <RawVal as SorobanArbitrary>::Prototype,
-    ),
+    StringLen(<RawVal as SorobanArbitrary>::Prototype),
     StringNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -126,8 +127,7 @@ pub enum RawModBufPrototype {
     ),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModCallPrototype {
     Call(
         <RawVal as SorobanArbitrary>::Prototype,
@@ -141,8 +141,7 @@ pub enum RawModCallPrototype {
     ),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModContextPrototype {
     ContractEvent(
         <RawVal as SorobanArbitrary>::Prototype,
@@ -169,8 +168,7 @@ pub enum RawModContextPrototype {
     ),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModCryptoPrototype {
     ComputeHashSha256(<RawVal as SorobanArbitrary>::Prototype),
     VerifySigEd25519(
@@ -180,8 +178,7 @@ pub enum RawModCryptoPrototype {
     ),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModIntPrototype {
     ObjFromI64(<i64 as SorobanArbitrary>::Prototype),
     ObjFromI128Pieces(
@@ -221,8 +218,7 @@ pub enum RawModIntPrototype {
     ObjToU256LoLo(<RawVal as SorobanArbitrary>::Prototype),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModLedgerPrototype {
     CreateAssetContract(<RawVal as SorobanArbitrary>::Prototype),
     CreateContract(
@@ -241,12 +237,20 @@ pub enum RawModLedgerPrototype {
     UploadWasm(<RawVal as SorobanArbitrary>::Prototype),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
-pub enum RawModMapPrototype {    
-    MapDel(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
-    MapGet(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
-    MapHas(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
+pub enum RawModMapPrototype {
+    MapDel(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
+    MapGet(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
+    MapHas(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
     MapKeys(<RawVal as SorobanArbitrary>::Prototype),
     MapLen(<RawVal as SorobanArbitrary>::Prototype),
     MapMaxKey(<RawVal as SorobanArbitrary>::Prototype),
@@ -257,8 +261,14 @@ pub enum RawModMapPrototype {
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    MapNextKey(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
-    MapPrevKey(<RawVal as SorobanArbitrary>::Prototype, <RawVal as SorobanArbitrary>::Prototype),
+    MapNextKey(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
+    MapPrevKey(
+        <RawVal as SorobanArbitrary>::Prototype,
+        <RawVal as SorobanArbitrary>::Prototype,
+    ),
     MapPut(
         <RawVal as SorobanArbitrary>::Prototype,
         <RawVal as SorobanArbitrary>::Prototype,
@@ -273,8 +283,7 @@ pub enum RawModMapPrototype {
     MapValues(<RawVal as SorobanArbitrary>::Prototype),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModPrngPrototype {
     PrngBytesNew(u32),
     PrngReseed(<RawVal as SorobanArbitrary>::Prototype),
@@ -282,8 +291,7 @@ pub enum RawModPrngPrototype {
     PrngVecShuffle(<RawVal as SorobanArbitrary>::Prototype),
 }
 
-#[derive(Clone, Debug)]
-#[derive(arbitrary::Arbitrary)]
+#[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModVecPrototype {
     VecAppend(
         <RawVal as SorobanArbitrary>::Prototype,
@@ -355,35 +363,51 @@ impl RawFuzzInstructionPrototype {
             RawFuzzInstructionPrototype::Address(v) => match v {
                 RawModAddressPrototype::AccountPublicKeyToAddress(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Address(RawModAddress::AccountPublicKeyToAddress(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Address(RawModAddress::AccountPublicKeyToAddress(
+                        FakeRawVal(v.get_payload()),
+                    ))
                 }
                 RawModAddressPrototype::AddressToAccountPublicKey(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Address(RawModAddress::AddressToAccountPublicKey(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Address(RawModAddress::AddressToAccountPublicKey(
+                        FakeRawVal(v.get_payload()),
+                    ))
                 }
                 RawModAddressPrototype::AddressToContractId(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Address(RawModAddress::AddressToContractId(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Address(RawModAddress::AddressToContractId(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModAddressPrototype::ContractIdToAddress(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Address(RawModAddress::ContractIdToAddress(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Address(RawModAddress::ContractIdToAddress(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModAddressPrototype::RequireAuth(v_0) => {
                     let v_0 = RawVal::from_val(env, v_0);
-                    RawFuzzInstruction::Address(RawModAddress::RequireAuth(FakeRawVal(v_0.get_payload())))
+                    RawFuzzInstruction::Address(RawModAddress::RequireAuth(FakeRawVal(
+                        v_0.get_payload(),
+                    )))
                 }
                 RawModAddressPrototype::RequireAuthForArgs(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
                     let v_1 = RawVal::from_val(env, v_1);
-                    RawFuzzInstruction::Address(RawModAddress::RequireAuthForArgs(FakeRawVal(v_0.get_payload()), FakeRawVal(v_1.get_payload())))
+                    RawFuzzInstruction::Address(RawModAddress::RequireAuthForArgs(
+                        FakeRawVal(v_0.get_payload()),
+                        FakeRawVal(v_1.get_payload()),
+                    ))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Buf(v) => match v {
                 RawModBufPrototype::BytesAppend(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
                     let v_1 = RawVal::from_val(env, v_1);
-                    RawFuzzInstruction::Buf(RawModBuf::BytesAppend(FakeRawVal(v_0.get_payload()), FakeRawVal(v_1.get_payload())))
+                    RawFuzzInstruction::Buf(RawModBuf::BytesAppend(
+                        FakeRawVal(v_0.get_payload()),
+                        FakeRawVal(v_1.get_payload()),
+                    ))
                 }
                 RawModBufPrototype::BytesBack(v) => {
                     let v = RawVal::from_val(env, v);
@@ -437,9 +461,7 @@ impl RawFuzzInstructionPrototype {
                     let v = RawVal::from_val(env, v);
                     RawFuzzInstruction::Buf(RawModBuf::BytesLen(FakeRawVal(v.get_payload())))
                 }
-                RawModBufPrototype::BytesNew => {
-                    RawFuzzInstruction::Buf(RawModBuf::BytesNew)
-                }
+                RawModBufPrototype::BytesNew => RawFuzzInstruction::Buf(RawModBuf::BytesNew),
                 RawModBufPrototype::BytesNewFromLinearMemory(v_0, v_1) => {
                     RawFuzzInstruction::Buf(RawModBuf::BytesNewFromLinearMemory(*v_0, *v_1))
                 }
@@ -472,15 +494,24 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModBufPrototype::DeserializeFromBytes(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Buf(RawModBuf::DeserializeFromBytes(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Buf(RawModBuf::DeserializeFromBytes(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModBufPrototype::SerializeToBytes(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Buf(RawModBuf::SerializeToBytes(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Buf(RawModBuf::SerializeToBytes(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModBufPrototype::StringCopyToLinearMemory(v_0, v_1, v_2, v_3) => {
                     let v_0 = RawVal::from_val(env, v_0);
-                    RawFuzzInstruction::Buf(RawModBuf::StringCopyToLinearMemory(FakeRawVal(v_0.get_payload()), *v_1, *v_2, *v_3))
+                    RawFuzzInstruction::Buf(RawModBuf::StringCopyToLinearMemory(
+                        FakeRawVal(v_0.get_payload()),
+                        *v_1,
+                        *v_2,
+                        *v_3,
+                    ))
                 }
                 RawModBufPrototype::StringLen(v) => {
                     let v = RawVal::from_val(env, v);
@@ -491,11 +522,20 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModBufPrototype::SymbolCopyToLinearMemory(v_0, v_1, v_2, v_3) => {
                     let v_0 = RawVal::from_val(env, v_0);
-                    RawFuzzInstruction::Buf(RawModBuf::SymbolCopyToLinearMemory(FakeRawVal(v_0.get_payload()), *v_1, *v_2, *v_3))
+                    RawFuzzInstruction::Buf(RawModBuf::SymbolCopyToLinearMemory(
+                        FakeRawVal(v_0.get_payload()),
+                        *v_1,
+                        *v_2,
+                        *v_3,
+                    ))
                 }
                 RawModBufPrototype::SymbolIndexInLinearMemory(v_0, v_1, v_2) => {
                     let v_0 = RawVal::from_val(env, v_0);
-                    RawFuzzInstruction::Buf(RawModBuf::SymbolIndexInLinearMemory(FakeRawVal(v_0.get_payload()), *v_1, *v_2))
+                    RawFuzzInstruction::Buf(RawModBuf::SymbolIndexInLinearMemory(
+                        FakeRawVal(v_0.get_payload()),
+                        *v_1,
+                        *v_2,
+                    ))
                 }
                 RawModBufPrototype::SymbolLen(v) => {
                     let v = RawVal::from_val(env, v);
@@ -504,7 +544,7 @@ impl RawFuzzInstructionPrototype {
                 RawModBufPrototype::SymbolNewFromLinearMemory(v_0, v_1) => {
                     RawFuzzInstruction::Buf(RawModBuf::SymbolNewFromLinearMemory(*v_0, *v_1))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Call(v) => match v {
                 RawModCallPrototype::Call(v_0, v_1, v_2) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -526,7 +566,7 @@ impl RawFuzzInstructionPrototype {
                         FakeRawVal(v_2.get_payload()),
                     ))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Context(v) => match v {
                 RawModContextPrototype::ContractEvent(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -538,7 +578,9 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModContextPrototype::FailWithError(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Context(RawModContext::FailWithError(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Context(RawModContext::FailWithError(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModContextPrototype::GetCurrentCallStack => {
                     RawFuzzInstruction::Context(RawModContext::GetCurrentCallStack)
@@ -560,12 +602,14 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModContextPrototype::GetLedgerTimestamp => {
                     RawFuzzInstruction::Context(RawModContext::GetLedgerTimestamp)
-                }            
+                }
                 RawModContextPrototype::GetLedgerVersion => {
                     RawFuzzInstruction::Context(RawModContext::GetLedgerVersion)
                 }
                 RawModContextPrototype::LogFromLinearMemory(v_0, v_1, v_2, v_3) => {
-                    RawFuzzInstruction::Context(RawModContext::LogFromLinearMemory(*v_0, *v_1, *v_2, *v_3))
+                    RawFuzzInstruction::Context(RawModContext::LogFromLinearMemory(
+                        *v_0, *v_1, *v_2, *v_3,
+                    ))
                 }
                 RawModContextPrototype::ObjCmp(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -575,11 +619,13 @@ impl RawFuzzInstructionPrototype {
                         FakeRawVal(v_1.get_payload()),
                     ))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Crypto(v) => match v {
                 RawModCryptoPrototype::ComputeHashSha256(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Crypto(RawModCrypto::ComputeHashSha256(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Crypto(RawModCrypto::ComputeHashSha256(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModCryptoPrototype::VerifySigEd25519(v_0, v_1, v_2) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -591,7 +637,7 @@ impl RawFuzzInstructionPrototype {
                         FakeRawVal(v_2.get_payload()),
                     ))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Int(v) => match v {
                 RawModIntPrototype::ObjFromI64(v) => {
                     RawFuzzInstruction::Int(RawModInt::ObjFromI64(*v))
@@ -667,11 +713,13 @@ impl RawFuzzInstructionPrototype {
                     let v = RawVal::from_val(env, v);
                     RawFuzzInstruction::Int(RawModInt::ObjToU256LoLo(FakeRawVal(v.get_payload())))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Ledger(v) => match v {
                 RawModLedgerPrototype::CreateAssetContract(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Ledger(RawModLedger::CreateAssetContract(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Ledger(RawModLedger::CreateAssetContract(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModLedgerPrototype::CreateContract(v_0, v_1, v_2) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -685,15 +733,21 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModLedgerPrototype::DelContractData(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Ledger(RawModLedger::DelContractData(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Ledger(RawModLedger::DelContractData(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModLedgerPrototype::GetContractData(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Ledger(RawModLedger::GetContractData(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Ledger(RawModLedger::GetContractData(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModLedgerPrototype::HasContractData(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Ledger(RawModLedger::HasContractData(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Ledger(RawModLedger::HasContractData(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModLedgerPrototype::PutContractData(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -705,13 +759,17 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModLedgerPrototype::UpdateCurrentContractWasm(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Ledger(RawModLedger::UpdateCurrentContractWasm(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Ledger(RawModLedger::UpdateCurrentContractWasm(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 RawModLedgerPrototype::UploadWasm(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Ledger(RawModLedger::UploadWasm(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Ledger(RawModLedger::UploadWasm(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Map(v) => match v {
                 RawModMapPrototype::MapDel(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -753,9 +811,7 @@ impl RawFuzzInstructionPrototype {
                     let v = RawVal::from_val(env, v);
                     RawFuzzInstruction::Map(RawModMap::MapMinKey(FakeRawVal(v.get_payload())))
                 }
-                RawModMapPrototype::MapNew => {
-                    RawFuzzInstruction::Map(RawModMap::MapNew)
-                }
+                RawModMapPrototype::MapNew => RawFuzzInstruction::Map(RawModMap::MapNew),
                 RawModMapPrototype::MapNewFromLinearMemory(v_0, v_1, v_2) => {
                     RawFuzzInstruction::Map(RawModMap::MapNewFromLinearMemory(*v_0, *v_1, *v_2))
                 }
@@ -798,7 +854,7 @@ impl RawFuzzInstructionPrototype {
                     let v = RawVal::from_val(env, v);
                     RawFuzzInstruction::Map(RawModMap::MapValues(FakeRawVal(v.get_payload())))
                 }
-            }
+            },
             RawFuzzInstructionPrototype::Prng(v) => match v {
                 RawModPrngPrototype::PrngBytesNew(v) => {
                     RawFuzzInstruction::Prng(RawModPrng::PrngBytesNew(*v))
@@ -812,12 +868,12 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModPrngPrototype::PrngVecShuffle(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Prng(RawModPrng::PrngVecShuffle(FakeRawVal(v.get_payload())))
+                    RawFuzzInstruction::Prng(RawModPrng::PrngVecShuffle(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
-            }
-            RawFuzzInstructionPrototype::Test => {
-                RawFuzzInstruction::Test
-            }
+            },
+            RawFuzzInstructionPrototype::Test => RawFuzzInstruction::Test,
             RawFuzzInstructionPrototype::Vec(v) => match v {
                 RawModVecPrototype::VecAppend(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -841,10 +897,7 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModVecPrototype::VecDel(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
-                    RawFuzzInstruction::Vec(RawModVec::VecDel(
-                        FakeRawVal(v_0.get_payload()),
-                        *v_1,
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecDel(FakeRawVal(v_0.get_payload()), *v_1))
                 }
                 RawModVecPrototype::VecFirstIndexOf(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -856,16 +909,11 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModVecPrototype::VecFront(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Vec(RawModVec::VecFront(
-                        FakeRawVal(v.get_payload()),
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecFront(FakeRawVal(v.get_payload())))
                 }
                 RawModVecPrototype::VecGet(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
-                    RawFuzzInstruction::Vec(RawModVec::VecGet(
-                        FakeRawVal(v_0.get_payload()),
-                        *v_1,
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecGet(FakeRawVal(v_0.get_payload()), *v_1))
                 }
                 RawModVecPrototype::VecInsert(v_0, v_1, v_2) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -886,30 +934,22 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModVecPrototype::VecLen(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Vec(RawModVec::VecLen(
-                        FakeRawVal(v.get_payload()),
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecLen(FakeRawVal(v.get_payload())))
                 }
                 RawModVecPrototype::VecNew(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Vec(RawModVec::VecNew(
-                        FakeRawVal(v.get_payload()),
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecNew(FakeRawVal(v.get_payload())))
                 }
                 RawModVecPrototype::VecNewFromLinearMemory(v_0, v_1) => {
                     RawFuzzInstruction::Vec(RawModVec::VecNewFromLinearMemory(*v_0, *v_1))
                 }
                 RawModVecPrototype::VecPopBack(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Vec(RawModVec::VecPopBack(
-                        FakeRawVal(v.get_payload()),
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecPopBack(FakeRawVal(v.get_payload())))
                 }
                 RawModVecPrototype::VecPopFront(v) => {
                     let v = RawVal::from_val(env, v);
-                    RawFuzzInstruction::Vec(RawModVec::VecPopFront(
-                        FakeRawVal(v.get_payload()),
-                    ))
+                    RawFuzzInstruction::Vec(RawModVec::VecPopFront(FakeRawVal(v.get_payload())))
                 }
                 RawModVecPrototype::VecPushBack(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -952,16 +992,16 @@ impl RawFuzzInstructionPrototype {
                         *v_2,
                     ))
                 }
-            }
+            },
         }
     }
 }
 
 fuzz_target!(|input: RawFuzzInstructionPrototype| {
     let env = Env::default();
-    
+
     let contract_id = env.register_contract_wasm(None, fuzzcontract::WASM);
-    
+
     let client = fuzzcontract::Client::new(&env, &contract_id);
 
     let fuzz_instruction = input.to_guest(&env);
