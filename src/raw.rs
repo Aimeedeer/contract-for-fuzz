@@ -14,6 +14,7 @@ pub enum RawFuzzInstruction {
     Int(RawModInt),
     Ledger(RawModLedger),
     Map(RawModMap),
+    Prng(RawModPrng),
     Test,
     Vec(RawModVec),
 }
@@ -69,7 +70,7 @@ pub enum RawModCall {
 #[derive(Clone, Debug)]
 pub enum RawModContext {
     ContractEvent(FakeRawVal, FakeRawVal),
-//    FailWithStatus(FakeRawVal),
+    FailWithError(FakeRawVal),
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -78,8 +79,7 @@ pub enum RawModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
-//    LogFmtValues(FakeRawVal, FakeRawVal),
-//    LogValue(FakeRawVal),
+    LogFromLinearMemory(u32, u32, u32, u32),
     ObjCmp(FakeRawVal, FakeRawVal),
 }
 
@@ -118,12 +118,14 @@ pub enum RawModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModLedger {
-//    CreateContractFromContract(FakeRawVal, FakeRawVal),
+    CreateAssetContract(FakeRawVal),
+    CreateContract(FakeRawVal, FakeRawVal, FakeRawVal),
     DelContractData(FakeRawVal),
     GetContractData(FakeRawVal),
     HasContractData(FakeRawVal),
     PutContractData(FakeRawVal, FakeRawVal),
     UpdateCurrentContractWasm(FakeRawVal),
+    UploadWasm(FakeRawVal),
 }
 
 #[contracttype]
@@ -143,6 +145,15 @@ pub enum RawModMap {
     MapPut(FakeRawVal, FakeRawVal, FakeRawVal),
     MapUnpackToLinearMemory(FakeRawVal, u32, u32, u32),
     MapValues(FakeRawVal),
+}
+
+#[contracttype]
+#[derive(Clone, Debug)]
+pub enum RawModPrng {
+    PrngBytesNew(u32),
+    PrngReseed(FakeRawVal),
+    PrngU64InInclusiveRange(u64, u64),
+    PrngVecShuffle(FakeRawVal),
 }
 
 #[contracttype]
@@ -362,10 +373,10 @@ impl RawFuzzInstruction {
 
                     syscalls::context::contract_event(v_0, v_1);
                 },
-/*                RawModContext::FailWithStatus(v) => unsafe {
+                RawModContext::FailWithError(v) => unsafe {
                     let v = mem::transmute(v.0);
-                    syscalls::context::fail_with_status(v);
-                },*/
+                    syscalls::context::fail_with_error(v);
+                },
                 RawModContext::GetCurrentCallStack => unsafe {
                     syscalls::context::get_current_call_stack();
                 },
@@ -390,15 +401,13 @@ impl RawFuzzInstruction {
                 RawModContext::GetLedgerVersion => unsafe {
                     syscalls::context::get_ledger_version();
                 },
-/*                RawModContext::LogFmtValues(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    syscalls::context::log_fmt_values(v_0, v_1);
+                RawModContext::LogFromLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
+                    let v_0 = U32Val::from(v_0);
+                    let v_1 = U32Val::from(v_1);
+                    let v_2 = U32Val::from(v_2);
+                    let v_3 = U32Val::from(v_3);
+                    syscalls::context::log_from_linear_memory(v_0, v_1, v_2, v_3);
                 },
-                RawModContext::LogValue(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::context::log_value(v);
-                },*/
                 RawModContext::ObjCmp(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
@@ -494,11 +503,16 @@ impl RawFuzzInstruction {
                 },
             },
             Ledger(v) => match v {
-/*                RawModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
+                RawModLedger::CreateAssetContract(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::create_asset_contract(v);
+                },
+                RawModLedger::CreateContract(v_0, v_1, v_2) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
-                    syscalls::ledger::create_contract_from_contract(v_0, v_1);
-                },*/
+                    let v_2 = mem::transmute(v_2.0);
+                    syscalls::ledger::create_contract(v_0, v_1, v_2);
+                },
                 RawModLedger::DelContractData(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::del_contract_data(v);
@@ -519,6 +533,10 @@ impl RawFuzzInstruction {
                 RawModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::update_current_contract_wasm(v);
+                },
+                RawModLedger::UploadWasm(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::upload_wasm(v);
                 },
             },
             Map(v) => match v {
@@ -589,6 +607,23 @@ impl RawFuzzInstruction {
                 RawModMap::MapValues(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::map::map_values(v);
+                },
+            },
+            Prng(v) => match v {
+                RawModPrng::PrngBytesNew(v) => unsafe {
+                    let v = U32Val::from(v);
+                    syscalls::prng::prng_bytes_new(v);
+                },
+                RawModPrng::PrngReseed(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::prng::prng_reseed(v);
+                },
+                RawModPrng::PrngU64InInclusiveRange(v_0, v_1) => unsafe {
+                    syscalls::prng::prng_u64_in_inclusive_range(v_0, v_1);
+                },
+                RawModPrng::PrngVecShuffle(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::prng::prng_vec_shuffle(v);
                 },
             },
             Test => unsafe {

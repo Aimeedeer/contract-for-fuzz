@@ -18,6 +18,7 @@ pub enum TypedFuzzInstruction {
     Int(TypedModInt),
     Ledger(TypedModLedger),
     Map(TypedModMap),
+    Prng(TypedModPrng),
     Test,
     Vec(TypedModVec),
 }
@@ -73,8 +74,7 @@ pub enum TypedModCall {
 #[derive(Clone, Debug)]
 pub enum TypedModContext {
     ContractEvent(Vec<RawVal>, FakeRawVal),
-    // todo
-    //    FailWithStatus(soroban_sdk::Status),
+    FailWithError(FakeRawVal), // soroban_env_common::Error
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -83,8 +83,7 @@ pub enum TypedModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
-//    LogFmtValues(String, Vec<RawVal>),
-//    LogValue(FakeRawVal),
+    LogFromLinearMemory(u32, u32, u32, u32),
     ObjCmp(FakeRawVal, FakeRawVal),
 }
 
@@ -123,12 +122,14 @@ pub enum TypedModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModLedger {
-//    CreateContractFromContract(Bytes, Bytes),
+    CreateAssetContract(Bytes),
+    CreateContract(Address, Bytes, Bytes),
     DelContractData(FakeRawVal),
     GetContractData(FakeRawVal),
     HasContractData(FakeRawVal),
     PutContractData(FakeRawVal, FakeRawVal),
     UpdateCurrentContractWasm(Bytes),
+    UploadWasm(Bytes),
 }
 
 #[contracttype]
@@ -148,6 +149,15 @@ pub enum TypedModMap {
     MapPut(Map<RawVal, RawVal>, FakeRawVal, FakeRawVal),
     MapUnpackToLinearMemory(Map<RawVal, RawVal>, u32, u32, u32),
     MapValues(Map<RawVal, RawVal>),
+}
+
+#[contracttype]
+#[derive(Clone, Debug)]
+pub enum TypedModPrng {
+    PrngBytesNew(u32),
+    PrngReseed(Bytes),
+    PrngU64InInclusiveRange(u64, u64),
+    PrngVecShuffle(Vec<RawVal>),
 }
 
 #[contracttype]
@@ -369,10 +379,10 @@ impl TypedFuzzInstruction {
 
                     syscalls::context::contract_event(v_0, v_1);
                 },
-                /*                TypedModContext::FailWithStatus(v) => unsafe {
-                    let v = Status::from(v);
-                    syscalls::context::fail_with_status(v);
-                },*/
+                TypedModContext::FailWithError(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::context::fail_with_error(v);
+                },
                 TypedModContext::GetCurrentCallStack => unsafe {
                     syscalls::context::get_current_call_stack();
                 },
@@ -397,15 +407,13 @@ impl TypedFuzzInstruction {
                 TypedModContext::GetLedgerVersion => unsafe {
                     syscalls::context::get_ledger_version();
                 },
-/*                TypedModContext::LogFmtValues(v_0, v_1) => unsafe {
-                    let v_0 = v_0.to_object();
-                    let v_1 = v_1.to_object();
-                    syscalls::context::log_fmt_values(v_0, v_1);
+                TypedModContext::LogFromLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
+                    let v_0 = U32Val::from(v_0);
+                    let v_1 = U32Val::from(v_1);
+                    let v_2 = U32Val::from(v_2);
+                    let v_3 = U32Val::from(v_3);
+                    syscalls::context::log_from_linear_memory(v_0, v_1, v_2, v_3);
                 },
-                TypedModContext::LogValue(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::context::log_value(v);
-                },*/
                 TypedModContext::ObjCmp(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
@@ -507,11 +515,16 @@ impl TypedFuzzInstruction {
                 },
             },
             Ledger(v) => match v {
-/*                TypedModLedger::CreateContractFromContract(v_0, v_1) => unsafe {
-                    let v_0 = BytesObject::from(v_0);
+                TypedModLedger::CreateAssetContract(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::ledger::create_asset_contract(v);
+                },
+                TypedModLedger::CreateContract(v_0, v_1, v_2) => unsafe {
+                    let v_0 = v_0.to_object();
                     let v_1 = BytesObject::from(v_1);
-                    syscalls::ledger::create_contract_from_contract(v_0, v_1);
-                },*/
+                    let v_2 = BytesObject::from(v_2);
+                    syscalls::ledger::create_contract(v_0, v_1, v_2);
+                },
                 TypedModLedger::DelContractData(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::del_contract_data(v);
@@ -532,6 +545,10 @@ impl TypedFuzzInstruction {
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = BytesObject::from(v);
                     syscalls::ledger::update_current_contract_wasm(v);
+                },
+                TypedModLedger::UploadWasm(v) => unsafe {
+                    let v = BytesObject::from(v);
+                    syscalls::ledger::upload_wasm(v);
                 },
             },
             Map(v) => match v {
@@ -603,6 +620,23 @@ impl TypedFuzzInstruction {
                 TypedModMap::MapValues(v) => unsafe {
                     let v = v.to_object();
                     syscalls::map::map_values(v);
+                },
+            },
+            Prng(v) => match v {
+                TypedModPrng::PrngBytesNew(v) => unsafe {
+                    let v = U32Val::from(v);
+                    syscalls::prng::prng_bytes_new(v);
+                },
+                TypedModPrng::PrngReseed(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::prng::prng_reseed(v);
+                },
+                TypedModPrng::PrngU64InInclusiveRange(v_0, v_1) => unsafe {
+                    syscalls::prng::prng_u64_in_inclusive_range(v_0, v_1);
+                },
+                TypedModPrng::PrngVecShuffle(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::prng::prng_vec_shuffle(v);
                 },
             },
             Test => unsafe {
