@@ -387,7 +387,7 @@ impl TypedFuzzInstructionPrototype {
                     let v_1 = Vec::<RawVal>::from_val(env, v_1);
                     TypedFuzzInstruction::Address(TypedModAddress::RequireAuthForArgs(v_0, v_1))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Buf(v) => match v {
                 TypedModBufPrototype::BytesAppend(v_0, v_1) => TypedFuzzInstruction::Buf(
                     TypedModBuf::BytesAppend(v_0.into_val(env), v_1.into_val(env)),
@@ -427,9 +427,7 @@ impl TypedFuzzInstructionPrototype {
                     let v = Bytes::from_val(env, v);
                     TypedFuzzInstruction::Buf(TypedModBuf::BytesLen(v))
                 }
-                TypedModBufPrototype::BytesNew => {
-                    TypedFuzzInstruction::Buf(TypedModBuf::BytesNew)
-                }
+                TypedModBufPrototype::BytesNew => TypedFuzzInstruction::Buf(TypedModBuf::BytesNew),
                 TypedModBufPrototype::BytesNewFromLinearMemory(v_0, v_1) => {
                     TypedFuzzInstruction::Buf(TypedModBuf::BytesNewFromLinearMemory(*v_0, *v_1))
                 }
@@ -480,7 +478,9 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModBufPrototype::SymbolIndexInLinearMemory(v_0, v_1, v_2) => {
                     let v_0 = Symbol::from_val(env, v_0);
-                    TypedFuzzInstruction::Buf(TypedModBuf::SymbolIndexInLinearMemory(v_0, *v_1, *v_2))
+                    TypedFuzzInstruction::Buf(TypedModBuf::SymbolIndexInLinearMemory(
+                        v_0, *v_1, *v_2,
+                    ))
                 }
                 TypedModBufPrototype::SymbolLen(v) => {
                     let v = Symbol::from_val(env, v);
@@ -489,7 +489,7 @@ impl TypedFuzzInstructionPrototype {
                 TypedModBufPrototype::SymbolNewFromLinearMemory(v_0, v_1) => {
                     TypedFuzzInstruction::Buf(TypedModBuf::SymbolNewFromLinearMemory(*v_0, *v_1))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Call(v) => match v {
                 TypedModCallPrototype::Call(v_0, v_1, v_2) => {
                     let v_0 = Address::from_val(env, v_0);
@@ -503,7 +503,7 @@ impl TypedFuzzInstructionPrototype {
                     let v_2 = Vec::<RawVal>::from_val(env, v_2);
                     TypedFuzzInstruction::Call(TypedModCall::TryCall(v_0, v_1, v_2))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Context(v) => match v {
                 TypedModContextPrototype::ContractEvent(v_0, v_1) => {
                     let v_0 = Vec::<RawVal>::from_val(env, v_0);
@@ -515,7 +515,9 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModContextPrototype::FailWithError(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Context(TypedModContext::FailWithError(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Context(TypedModContext::FailWithError(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModContextPrototype::GetCurrentCallStack => {
                     TypedFuzzInstruction::Context(TypedModContext::GetCurrentCallStack)
@@ -542,7 +544,9 @@ impl TypedFuzzInstructionPrototype {
                     TypedFuzzInstruction::Context(TypedModContext::GetLedgerVersion)
                 }
                 TypedModContextPrototype::LogFromLinearMemory(v_0, v_1, v_2, v_3) => {
-                    TypedFuzzInstruction::Context(TypedModContext::LogFromLinearMemory(*v_0, *v_1, *v_2, *v_3))
+                    TypedFuzzInstruction::Context(TypedModContext::LogFromLinearMemory(
+                        *v_0, *v_1, *v_2, *v_3,
+                    ))
                 }
                 TypedModContextPrototype::ObjCmp(v_0, v_1) => {
                     let v_0 = RawVal::from_val(env, v_0);
@@ -552,7 +556,7 @@ impl TypedFuzzInstructionPrototype {
                         FakeRawVal(v_1.get_payload()),
                     ))
                 }
-            }            
+            },
             TypedFuzzInstructionPrototype::Crypto(v) => match v {
                 TypedModCryptoPrototype::ComputeHashSha256(v) => {
                     let v = Bytes::from_val(env, v);
@@ -564,7 +568,7 @@ impl TypedFuzzInstructionPrototype {
                     let v_2 = Bytes::from_val(env, v_2);
                     TypedFuzzInstruction::Crypto(TypedModCrypto::VerifySigEd25519(v_0, v_1, v_2))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Int(v) => match v {
                 TypedModIntPrototype::ObjFromI64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjFromI64(*v))
@@ -573,7 +577,9 @@ impl TypedFuzzInstructionPrototype {
                     TypedFuzzInstruction::Int(TypedModInt::ObjFromI128Pieces(*v_0, *v_1))
                 }
                 TypedModIntPrototype::ObjFromI256Pieces(v_0, v_1, v_2, v_3) => {
-                    TypedFuzzInstruction::Int(TypedModInt::ObjFromI256Pieces(*v_0, *v_1, *v_2, *v_3))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjFromI256Pieces(
+                        *v_0, *v_1, *v_2, *v_3,
+                    ))
                 }
                 TypedModIntPrototype::ObjFromU64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjFromU64(*v))
@@ -582,7 +588,9 @@ impl TypedFuzzInstructionPrototype {
                     TypedFuzzInstruction::Int(TypedModInt::ObjFromU128Pieces(*v_0, *v_1))
                 }
                 TypedModIntPrototype::ObjFromU256Pieces(v_0, v_1, v_2, v_3) => {
-                    TypedFuzzInstruction::Int(TypedModInt::ObjFromU256Pieces(*v_0, *v_1, *v_2, *v_3))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjFromU256Pieces(
+                        *v_0, *v_1, *v_2, *v_3,
+                    ))
                 }
                 TypedModIntPrototype::ObjToI64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjToI64(*v))
@@ -595,19 +603,27 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModIntPrototype::ObjToI256HiHi(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiHi(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiHi(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToI256HiLo(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiLo(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiLo(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToI256LoHi(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoHi(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoHi(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToI256LoLo(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoLo(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoLo(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToU64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjToU64(*v))
@@ -620,21 +636,29 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModIntPrototype::ObjToU256HiHi(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiHi(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiHi(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToU256HiLo(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiLo(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiLo(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToU256LoHi(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoHi(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoHi(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjToU256LoLo(v) => {
                     let v = RawVal::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoLo(FakeRawVal(v.get_payload())))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoLo(FakeRawVal(
+                        v.get_payload(),
+                    )))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Ledger(v) => match v {
                 TypedModLedgerPrototype::CreateAssetContract(v) => {
                     let v = Bytes::from_val(env, v);
@@ -680,22 +704,31 @@ impl TypedFuzzInstructionPrototype {
                     let v = Bytes::from_val(env, v);
                     TypedFuzzInstruction::Ledger(TypedModLedger::UploadWasm(v))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Map(v) => match v {
                 TypedModMapPrototype::MapDel(v_0, v_1) => {
                     let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                     let v_1 = RawVal::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapDel(v_0, FakeRawVal(v_1.get_payload())))
+                    TypedFuzzInstruction::Map(TypedModMap::MapDel(
+                        v_0,
+                        FakeRawVal(v_1.get_payload()),
+                    ))
                 }
                 TypedModMapPrototype::MapGet(v_0, v_1) => {
                     let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                     let v_1 = RawVal::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapGet(v_0, FakeRawVal(v_1.get_payload())))
+                    TypedFuzzInstruction::Map(TypedModMap::MapGet(
+                        v_0,
+                        FakeRawVal(v_1.get_payload()),
+                    ))
                 }
                 TypedModMapPrototype::MapHas(v_0, v_1) => {
                     let v_0 = Map::<RawVal, RawVal>::from_val(env, v_0);
                     let v_1 = RawVal::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapHas(v_0, FakeRawVal(v_1.get_payload())))
+                    TypedFuzzInstruction::Map(TypedModMap::MapHas(
+                        v_0,
+                        FakeRawVal(v_1.get_payload()),
+                    ))
                 }
                 TypedModMapPrototype::MapKeys(v) => {
                     let v = Map::<RawVal, RawVal>::from_val(env, v);
@@ -753,7 +786,7 @@ impl TypedFuzzInstructionPrototype {
                     let v = Map::<RawVal, RawVal>::from_val(env, v);
                     TypedFuzzInstruction::Map(TypedModMap::MapValues(v))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Prng(v) => match v {
                 TypedModPrngPrototype::PrngBytesNew(v) => {
                     TypedFuzzInstruction::Prng(TypedModPrng::PrngBytesNew(*v))
@@ -769,7 +802,7 @@ impl TypedFuzzInstructionPrototype {
                     let v = Vec::<RawVal>::from_val(env, v);
                     TypedFuzzInstruction::Prng(TypedModPrng::PrngVecShuffle(v))
                 }
-            }
+            },
             TypedFuzzInstructionPrototype::Test => TypedFuzzInstruction::Test,
             TypedFuzzInstructionPrototype::Vec(v) => match v {
                 TypedModVecPrototype::VecAppend(v_0, v_1) => {
@@ -878,7 +911,7 @@ impl TypedFuzzInstructionPrototype {
                     let v_0 = Vec::<RawVal>::from_val(env, v_0);
                     TypedFuzzInstruction::Vec(TypedModVec::VecUnpackToLinearMemory(v_0, *v_1, *v_2))
                 }
-            }
+            },
         }
     }
 }
