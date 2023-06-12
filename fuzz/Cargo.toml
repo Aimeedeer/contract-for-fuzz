@@ -43,3 +43,9 @@ name = "typed_fuzz"
 path = "fuzz_targets/typed_fuzz.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "vec_fuzz"
+path = "fuzz_targets/vec_fuzz.rs"
+test = false
+doc = false
