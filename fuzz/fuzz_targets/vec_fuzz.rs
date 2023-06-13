@@ -6,7 +6,7 @@ use soroban_sdk::arbitrary::arbitrary;
 use soroban_sdk::arbitrary::fuzz_catch_panic;
 use soroban_sdk::arbitrary::SorobanArbitrary;
 use soroban_sdk::testutils::Logger;
-use soroban_sdk::{Env, FromVal, RawVal,Vec};
+use soroban_sdk::{Env, FromVal, RawVal, Vec};
 use std::vec::Vec as RustVec;
 
 mod fuzzcontract {
@@ -62,7 +62,8 @@ pub enum TypedModVecPrototype {
 
 impl TestCases {
     fn to_guest(&self, env: &Env) -> RustVec<TypedFuzzInstruction> {
-        let instructions = self.tests
+        let instructions = self
+            .tests
             .iter()
             .map(|test| match test {
                 TypedModVecPrototype::VecAppend => {
@@ -86,7 +87,7 @@ impl TestCases {
                     let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     TypedFuzzInstruction::Vec(TypedModVec::VecDel(v_0, *v))
                 }
-               TypedModVecPrototype::VecFirstIndexOf(v) => {
+                TypedModVecPrototype::VecFirstIndexOf(v) => {
                     let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     let v_1 = RawVal::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecFirstIndexOf(
@@ -178,7 +179,6 @@ impl TestCases {
     }
 }
 
-        
 fuzz_target!(|input: TestCases| {
     let env = Env::default();
 
