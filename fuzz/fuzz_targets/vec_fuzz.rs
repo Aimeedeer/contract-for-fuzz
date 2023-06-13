@@ -62,67 +62,58 @@ pub enum TypedModVecPrototype {
 
 impl TestCases {
     fn to_guest(&self, env: &Env) -> RustVec<TypedFuzzInstruction> {
-        let instructions = self
-            .tests
+        let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
+        let v_1 = Vec::<RawVal>::from_val(env, &self.v_1);
+
+        self.tests
             .iter()
             .map(|test| match test {
                 TypedModVecPrototype::VecAppend => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    let v_1 = Vec::<RawVal>::from_val(env, &self.v_1);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecAppend(v_0, v_1))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecAppend(v_0.clone(), v_1.clone()))
                 }
                 TypedModVecPrototype::VecBack => {
-                    let v = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecBack(v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecBack(v_0.clone()))
                 }
                 TypedModVecPrototype::VecBinarySearch(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    let v_1 = RawVal::from_val(env, v);
+                    let v = RawVal::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecBinarySearch(
-                        v_0,
-                        FakeRawVal(v_1.get_payload()),
+                        v_0.clone(),
+                        FakeRawVal(v.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecDel(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecDel(v_0, *v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecDel(v_0.clone(), *v))
                 }
                 TypedModVecPrototype::VecFirstIndexOf(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    let v_1 = RawVal::from_val(env, v);
+                    let v = RawVal::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecFirstIndexOf(
-                        v_0,
-                        FakeRawVal(v_1.get_payload()),
+                        v_0.clone(),
+                        FakeRawVal(v.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecFront => {
-                    let v = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecFront(v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecFront(v_0.clone()))
                 }
                 TypedModVecPrototype::VecGet(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecGet(v_0, *v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecGet(v_0.clone(), *v))
                 }
                 TypedModVecPrototype::VecInsert(v_1, v_2) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     let v_2 = RawVal::from_val(env, v_2);
                     TypedFuzzInstruction::Vec(TypedModVec::VecInsert(
-                        v_0,
+                        v_0.clone(),
                         *v_1,
                         FakeRawVal(v_2.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecLastIndexOf(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     let v_1 = RawVal::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecLastIndexOf(
-                        v_0,
+                        v_0.clone(),
                         FakeRawVal(v_1.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecLen => {
-                    let v = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecLen(v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecLen(v_0.clone()))
                 }
                 TypedModVecPrototype::VecNew(v) => {
                     let v = RawVal::from_val(env, v);
@@ -132,50 +123,45 @@ impl TestCases {
                     TypedFuzzInstruction::Vec(TypedModVec::VecNewFromLinearMemory(*v_0, *v_1))
                 }
                 TypedModVecPrototype::VecPopBack => {
-                    let v = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecPopBack(v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecPopBack(v_0.clone()))
                 }
                 TypedModVecPrototype::VecPopFront => {
-                    let v = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecPopFront(v))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecPopFront(v_0.clone()))
                 }
                 TypedModVecPrototype::VecPushBack(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     let v_1 = RawVal::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecPushBack(
-                        v_0,
+                        v_0.clone(),
                         FakeRawVal(v_1.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecPushFront(v) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     let v_1 = RawVal::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecPushFront(
-                        v_0,
+                        v_0.clone(),
                         FakeRawVal(v_1.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecPut(v_1, v_2) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
                     let v_2 = RawVal::from_val(env, v_2);
                     TypedFuzzInstruction::Vec(TypedModVec::VecPut(
-                        v_0,
+                        v_0.clone(),
                         *v_1,
                         FakeRawVal(v_2.get_payload()),
                     ))
                 }
                 TypedModVecPrototype::VecSlice(v_1, v_2) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecSlice(v_0, *v_1, *v_2))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecSlice(v_0.clone(), *v_1, *v_2))
                 }
                 TypedModVecPrototype::VecUnpackToLinearMemory(v_1, v_2) => {
-                    let v_0 = Vec::<RawVal>::from_val(env, &self.v_0);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecUnpackToLinearMemory(v_0, *v_1, *v_2))
+                    TypedFuzzInstruction::Vec(TypedModVec::VecUnpackToLinearMemory(
+                        v_0.clone(),
+                        *v_1,
+                        *v_2,
+                    ))
                 }
             })
-            .collect();
-
-        instructions
+            .collect()
     }
 }
 
