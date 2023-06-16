@@ -16,8 +16,8 @@ mod fuzzcontract {
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub struct TestCases {
-    vec_0: <Vec<RawVal> as SorobanArbitrary>::Prototype,
-    vec_1: <Vec<RawVal> as SorobanArbitrary>::Prototype,
+    vec_0: <Vec<u64> as SorobanArbitrary>::Prototype,
+    vec_1: <Vec<u64> as SorobanArbitrary>::Prototype,
     tests: [TypedModVecPrototype; 10],
 }
 
@@ -25,29 +25,29 @@ pub struct TestCases {
 pub enum TypedModVecPrototype {
     VecAppend,
     VecBack,
-    VecBinarySearch(<RawVal as SorobanArbitrary>::Prototype),
+    VecBinarySearch(<u64 as SorobanArbitrary>::Prototype),
     VecDel(<u32 as SorobanArbitrary>::Prototype),
-    VecFirstIndexOf(<RawVal as SorobanArbitrary>::Prototype),
+    VecFirstIndexOf(<u64 as SorobanArbitrary>::Prototype),
     VecFront,
     VecGet(<u32 as SorobanArbitrary>::Prototype),
     VecInsert(
         <u32 as SorobanArbitrary>::Prototype,
-        <RawVal as SorobanArbitrary>::Prototype,
+        <u64 as SorobanArbitrary>::Prototype,
     ),
-    VecLastIndexOf(<RawVal as SorobanArbitrary>::Prototype),
+    VecLastIndexOf(<u64 as SorobanArbitrary>::Prototype),
     VecLen,
-    VecNew(<RawVal as SorobanArbitrary>::Prototype),
+    VecNew(<u32 as SorobanArbitrary>::Prototype),
     VecNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     VecPopBack,
     VecPopFront,
-    VecPushBack(<RawVal as SorobanArbitrary>::Prototype),
-    VecPushFront(<RawVal as SorobanArbitrary>::Prototype),
+    VecPushBack(<u64 as SorobanArbitrary>::Prototype),
+    VecPushFront(<u64 as SorobanArbitrary>::Prototype),
     VecPut(
         <u32 as SorobanArbitrary>::Prototype,
-        <RawVal as SorobanArbitrary>::Prototype,
+        <u64 as SorobanArbitrary>::Prototype,
     ),
     VecSlice(
         <u32 as SorobanArbitrary>::Prototype,
@@ -165,8 +165,10 @@ fuzz_target!(|input: TestCases| {
 
     let client = fuzzcontract::Client::new(&env, &contract_id);
 
-    let v_0 = Vec::<RawVal>::from_val(&env, &input.vec_0);
-    let v_1 = Vec::<RawVal>::from_val(&env, &input.vec_1);
+    let v_0 = Vec::<u64>::from_val(&env, &input.vec_0);
+    let v_1 = Vec::<u64>::from_val(&env, &input.vec_1);
+    let v_0 = Vec::<RawVal>::from_val(&env, &v_0);
+    let v_1 = Vec::<RawVal>::from_val(&env, &v_1);
 
     for test in input.tests {
         let fuzz_instruction = test.to_guest(&env, &v_0, &v_1);
