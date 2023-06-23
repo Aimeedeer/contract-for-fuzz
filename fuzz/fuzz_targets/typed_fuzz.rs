@@ -35,6 +35,7 @@ pub enum TypedModAddressPrototype {
     AccountPublicKeyToAddress(<Bytes as SorobanArbitrary>::Prototype),
     AddressToAccountPublicKey(<Address as SorobanArbitrary>::Prototype),
     AddressToContractId(<Address as SorobanArbitrary>::Prototype),
+    AuthorizeAsCurrContract(<Vec<Val> as SorobanArbitrary>::Prototype),
     ContractIdToAddress(<Bytes as SorobanArbitrary>::Prototype),
     RequireAuth(<Address as SorobanArbitrary>::Prototype),
     RequireAuthForArgs(
@@ -374,6 +375,10 @@ impl TypedFuzzInstructionPrototype {
                 TypedModAddressPrototype::AddressToContractId(v) => {
                     let v = Address::from_val(env, v);
                     TypedFuzzInstruction::Address(TypedModAddress::AddressToContractId(v))
+                }
+                TypedModAddressPrototype::AuthorizeAsCurrContract(v) => {
+                    let v = Vec::<Val>::from_val(env, v);
+                    TypedFuzzInstruction::Address(TypedModAddress::AuthorizeAsCurrContract(v))
                 }
                 TypedModAddressPrototype::ContractIdToAddress(v) => {
                     let v = Bytes::from_val(env, v);

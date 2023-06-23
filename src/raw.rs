@@ -25,6 +25,7 @@ pub enum RawModAddress {
     AccountPublicKeyToAddress(FakeVal),
     AddressToAccountPublicKey(FakeVal),
     AddressToContractId(FakeVal),
+    AuthorizeAsCurrContract(FakeVal),
     ContractIdToAddress(FakeVal),
     RequireAuth(FakeVal),
     RequireAuthForArgs(FakeVal, FakeVal),
@@ -197,6 +198,10 @@ impl RawFuzzInstruction {
                 RawModAddress::AddressToContractId(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::address::address_to_contract_id(v);
+                },
+                RawModAddress::AuthorizeAsCurrContract(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::address::authorize_as_curr_contract(v);
                 },
                 RawModAddress::ContractIdToAddress(v) => unsafe {
                     let v = mem::transmute(v.0);

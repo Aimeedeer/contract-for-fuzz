@@ -29,6 +29,7 @@ pub enum TypedModAddress {
     AccountPublicKeyToAddress(Bytes),
     AddressToAccountPublicKey(Address),
     AddressToContractId(Address),
+    AuthorizeAsCurrContract(Vec<Val>),
     ContractIdToAddress(Bytes),
     RequireAuth(Address),
     RequireAuthForArgs(Address, Vec<Val>),
@@ -201,6 +202,10 @@ impl TypedFuzzInstruction {
                 TypedModAddress::AddressToContractId(v) => unsafe {
                     let v = v.to_object();
                     syscalls::address::address_to_contract_id(v);
+                },
+                TypedModAddress::AuthorizeAsCurrContract(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::address::authorize_as_curr_contract(v);
                 },
                 TypedModAddress::ContractIdToAddress(v) => unsafe {
                     let v = BytesObject::from(v);

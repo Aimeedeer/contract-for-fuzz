@@ -34,6 +34,7 @@ pub enum RawModAddressPrototype {
     AccountPublicKeyToAddress(<Val as SorobanArbitrary>::Prototype),
     AddressToAccountPublicKey(<Val as SorobanArbitrary>::Prototype),
     AddressToContractId(<Val as SorobanArbitrary>::Prototype),
+    AuthorizeAsCurrContract(<Val as SorobanArbitrary>::Prototype),
     ContractIdToAddress(<Val as SorobanArbitrary>::Prototype),
     RequireAuth(<Val as SorobanArbitrary>::Prototype),
     RequireAuthForArgs(
@@ -377,6 +378,12 @@ impl RawFuzzInstructionPrototype {
                 RawModAddressPrototype::AddressToContractId(v) => {
                     let v = Val::from_val(env, v);
                     RawFuzzInstruction::Address(RawModAddress::AddressToContractId(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
+                RawModAddressPrototype::AuthorizeAsCurrContract(v) => {
+                    let v = Val::from_val(env, v);
+                    RawFuzzInstruction::Address(RawModAddress::AuthorizeAsCurrContract(FakeVal(
                         v.get_payload(),
                     )))
                 }
