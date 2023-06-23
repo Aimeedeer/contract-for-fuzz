@@ -1,6 +1,6 @@
 use crate::{syscalls, FakeVal};
 use core::mem;
-use soroban_env_common::{U32Val, StorageType};
+use soroban_env_common::{StorageType, U32Val};
 use soroban_sdk::contracttype;
 
 #[contracttype]
@@ -389,7 +389,7 @@ impl RawFuzzInstruction {
                     syscalls::context::get_current_contract_address();
                 },
                 RawModContext::GetCurrentContractId => unsafe {
-//                    syscalls::context::get_current_contract_id();
+                    //                    syscalls::context::get_current_contract_id();
                 },
                 RawModContext::GetInvokingContract => unsafe {
                     syscalls::context::get_invoking_contract();

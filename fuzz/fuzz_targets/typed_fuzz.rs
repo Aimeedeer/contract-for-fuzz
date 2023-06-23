@@ -7,7 +7,7 @@ use soroban_sdk::arbitrary::fuzz_catch_panic;
 use soroban_sdk::arbitrary::SorobanArbitrary;
 use soroban_sdk::testutils::Logger;
 use soroban_sdk::{Address, Bytes, Vec};
-use soroban_sdk::{Env, FromVal, IntoVal, Map, Val, String, Symbol};
+use soroban_sdk::{Env, FromVal, IntoVal, Map, String, Symbol, Val};
 
 mod fuzzcontract {
     soroban_sdk::contractimport!(
@@ -609,27 +609,19 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModIntPrototype::ObjToI256HiHi(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiHi(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiHi(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToI256HiLo(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiLo(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256HiLo(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToI256LoHi(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoHi(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoHi(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToI256LoLo(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoLo(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToI256LoLo(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToU64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjToU64(*v))
@@ -642,27 +634,19 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModIntPrototype::ObjToU256HiHi(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiHi(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiHi(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToU256HiLo(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiLo(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256HiLo(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToU256LoHi(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoHi(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoHi(FakeVal(v.get_payload())))
                 }
                 TypedModIntPrototype::ObjToU256LoLo(v) => {
                     let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoLo(FakeVal(
-                        v.get_payload(),
-                    )))
+                    TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoLo(FakeVal(v.get_payload())))
                 }
             },
             TypedFuzzInstructionPrototype::Ledger(v) => match v {
@@ -717,26 +701,17 @@ impl TypedFuzzInstructionPrototype {
                 TypedModMapPrototype::MapDel(v_0, v_1) => {
                     let v_0 = Map::<Val, Val>::from_val(env, v_0);
                     let v_1 = Val::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapDel(
-                        v_0,
-                        FakeVal(v_1.get_payload()),
-                    ))
+                    TypedFuzzInstruction::Map(TypedModMap::MapDel(v_0, FakeVal(v_1.get_payload())))
                 }
                 TypedModMapPrototype::MapGet(v_0, v_1) => {
                     let v_0 = Map::<Val, Val>::from_val(env, v_0);
                     let v_1 = Val::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapGet(
-                        v_0,
-                        FakeVal(v_1.get_payload()),
-                    ))
+                    TypedFuzzInstruction::Map(TypedModMap::MapGet(v_0, FakeVal(v_1.get_payload())))
                 }
                 TypedModMapPrototype::MapHas(v_0, v_1) => {
                     let v_0 = Map::<Val, Val>::from_val(env, v_0);
                     let v_1 = Val::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapHas(
-                        v_0,
-                        FakeVal(v_1.get_payload()),
-                    ))
+                    TypedFuzzInstruction::Map(TypedModMap::MapHas(v_0, FakeVal(v_1.get_payload())))
                 }
                 TypedModMapPrototype::MapKeys(v) => {
                     let v = Map::<Val, Val>::from_val(env, v);

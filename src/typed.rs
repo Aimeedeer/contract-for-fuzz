@@ -1,11 +1,11 @@
 use crate::{syscalls, FakeVal};
 use core::mem;
 use soroban_env_common::{
-    BytesObject, I128Object, I256Object, I64Object, SymbolObject, U128Object, U256Object, U32Val,
-    U64Object, StorageType,
+    BytesObject, I128Object, I256Object, I64Object, StorageType, SymbolObject, U128Object,
+    U256Object, U32Val, U64Object,
 };
 use soroban_sdk::contracttype;
-use soroban_sdk::{Address, Bytes, Env, Map, Val, String, Symbol, TryFromVal, Vec};
+use soroban_sdk::{Address, Bytes, Env, Map, String, Symbol, TryFromVal, Val, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -392,7 +392,7 @@ impl TypedFuzzInstruction {
                     syscalls::context::get_current_contract_address();
                 },
                 TypedModContext::GetCurrentContractId => unsafe {
-//                    syscalls::context::get_current_contract_id();
+                    //                    syscalls::context::get_current_contract_id();
                 },
                 TypedModContext::GetInvokingContract => unsafe {
                     syscalls::context::get_invoking_contract();

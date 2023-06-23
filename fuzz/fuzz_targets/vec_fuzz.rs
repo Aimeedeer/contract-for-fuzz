@@ -147,13 +147,9 @@ impl TypedModVecPrototype {
             TypedModVecPrototype::VecSlice(v_1, v_2) => {
                 TypedFuzzInstruction::Vec(TypedModVec::VecSlice(v_0.clone(), *v_1, *v_2))
             }
-            TypedModVecPrototype::VecUnpackToLinearMemory(v_1, v_2) => {
-                TypedFuzzInstruction::Vec(TypedModVec::VecUnpackToLinearMemory(
-                    v_0.clone(),
-                    *v_1,
-                    *v_2,
-                ))
-            }
+            TypedModVecPrototype::VecUnpackToLinearMemory(v_1, v_2) => TypedFuzzInstruction::Vec(
+                TypedModVec::VecUnpackToLinearMemory(v_0.clone(), *v_1, *v_2),
+            ),
         }
     }
 }
@@ -173,7 +169,7 @@ fuzz_target!(|input: TestCases| {
     for test in input.tests {
         let fuzz_instruction = test.to_guest(&env, &v_0, &v_1);
         let fuzz_instruction = FuzzInstruction::Typed(fuzz_instruction);
-        
+
         // Returning an error is ok; panicking is not.
         let panic_r = fuzz_catch_panic(|| {
             let _call_r = client.try_run(&fuzz_instruction);
