@@ -338,11 +338,10 @@ impl TypedFuzzInstruction {
                     syscalls::buf::symbol_copy_to_linear_memory(v_0, v_1, v_2, v_3);
                 },
                 TypedModBuf::SymbolIndexInLinearMemory(v_0, v_1, v_2) => unsafe {
-                    let v_0 = v_0.to_val();
+                    let v_0 = v_0.to_symbol_val();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
-// todo
-//                    syscalls::buf::symbol_index_in_linear_memory(v_0, v_1, v_2);
+                    syscalls::buf::symbol_index_in_linear_memory(v_0, v_1, v_2);
                 },
                 TypedModBuf::SymbolLen(v) => unsafe {
                     let v = v.to_val();
@@ -359,17 +358,15 @@ impl TypedFuzzInstruction {
             Call(v) => match v {
                 TypedModCall::Call(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = v_1.to_val();
+                    let v_1 = v_1.to_symbol_val();
                     let v_2 = v_2.to_object();
-// todo
-//                    syscalls::call::call(v_0, v_1, v_2);
+                    syscalls::call::call(v_0, v_1, v_2);
                 },
                 TypedModCall::TryCall(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = v_1.to_val();
+                    let v_1 = v_1.to_symbol_val();
                     let v_2 = v_2.to_object();
-// todo
-//                    syscalls::call::try_call(v_0, v_1, v_2);
+                    syscalls::call::try_call(v_0, v_1, v_2);
                 },
             },
             Context(v) => match v {
