@@ -1,6 +1,6 @@
 use crate::{syscalls, FakeVal};
 use core::mem;
-use soroban_env_common::U32Val;
+use soroban_env_common::{U32Val, StorageType};
 use soroban_sdk::contracttype;
 
 #[contracttype]
@@ -123,7 +123,7 @@ pub enum RawModLedger {
     DelContractData(FakeVal),
     GetContractData(FakeVal),
     HasContractData(FakeVal),
-    PutContractData(FakeVal, FakeVal),
+    PutContractData(FakeVal, FakeVal, FakeVal),
     UpdateCurrentContractWasm(FakeVal),
     UploadWasm(FakeVal),
 }
@@ -514,25 +514,22 @@ impl RawFuzzInstruction {
                     syscalls::ledger::create_contract(v_0, v_1, v_2);
                 },
                 RawModLedger::DelContractData(v) => unsafe {
-//                    let v = mem::transmute(v.0);
-                    // todo: an argument of type `StorageType` is missing
-//                    syscalls::ledger::del_contract_data(v);
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::del_contract_data(v, StorageType::Temporary);
                 },
                 RawModLedger::GetContractData(v) => unsafe {
-//                    let v = mem::transmute(v.0);
-                    // todo: an argument of type `StorageType` is missing
-//                    syscalls::ledger::get_contract_data(v);
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::get_contract_data(v, StorageType::Temporary);
                 },
                 RawModLedger::HasContractData(v) => unsafe {
-//                    let v = mem::transmute(v.0);
-                    // todo
-//                    syscalls::ledger::has_contract_data(v);
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::has_contract_data(v, StorageType::Temporary);
                 },
-                RawModLedger::PutContractData(v_0, v_1) => unsafe {
-//                    let v_0 = mem::transmute(v_0.0);
-//                    let v_1 = mem::transmute(v_1.0);
-                    // two arguments of type `StorageType` and `soroban_sdk::Val` are missing
-//                    syscalls::ledger::put_contract_data(v_0, v_1);
+                RawModLedger::PutContractData(v_0, v_1, v_2) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    let v_2 = mem::transmute(v_2.0);
+                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
                 },
                 RawModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = mem::transmute(v.0);

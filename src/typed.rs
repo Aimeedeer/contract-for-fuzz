@@ -2,7 +2,7 @@ use crate::{syscalls, FakeVal};
 use core::mem;
 use soroban_env_common::{
     BytesObject, I128Object, I256Object, I64Object, SymbolObject, U128Object, U256Object, U32Val,
-    U64Object,
+    U64Object, StorageType,
 };
 use soroban_sdk::contracttype;
 use soroban_sdk::{Address, Bytes, Env, Map, Val, String, Symbol, TryFromVal, Vec};
@@ -127,7 +127,7 @@ pub enum TypedModLedger {
     DelContractData(FakeVal),
     GetContractData(FakeVal),
     HasContractData(FakeVal),
-    PutContractData(FakeVal, FakeVal),
+    PutContractData(FakeVal, FakeVal, FakeVal),
     UpdateCurrentContractWasm(Bytes),
     UploadWasm(Bytes),
 }
@@ -526,25 +526,22 @@ impl TypedFuzzInstruction {
                     syscalls::ledger::create_contract(v_0, v_1, v_2);
                 },
                 TypedModLedger::DelContractData(v) => unsafe {
-                    // todo
-//                    let v = mem::transmute(v.0);
-//                    syscalls::ledger::del_contract_data(v);
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::del_contract_data(v, StorageType::Temporary);
                 },
                 TypedModLedger::GetContractData(v) => unsafe {
-// todo
-                    //                    let v = mem::transmute(v.0);
-//                    syscalls::ledger::get_contract_data(v);
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::get_contract_data(v, StorageType::Temporary);
                 },
                 TypedModLedger::HasContractData(v) => unsafe {
-// todo
-                    //                    let v = mem::transmute(v.0);
-//                    syscalls::ledger::has_contract_data(v);
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::has_contract_data(v, StorageType::Temporary);
                 },
-                TypedModLedger::PutContractData(v_0, v_1) => unsafe {
-// todo
-//                    let v_0 = mem::transmute(v_0.0);
-  //                  let v_1 = mem::transmute(v_1.0);
-    //                syscalls::ledger::put_contract_data(v_0, v_1);
+                TypedModLedger::PutContractData(v_0, v_1, v_2) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    let v_2 = mem::transmute(v_2.0);
+                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
                 },
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = BytesObject::from(v);
