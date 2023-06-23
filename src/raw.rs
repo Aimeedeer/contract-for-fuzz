@@ -1,4 +1,4 @@
-use crate::{syscalls, FakeRawVal};
+use crate::{syscalls, FakeVal};
 use core::mem;
 use soroban_env_common::U32Val;
 use soroban_sdk::contracttype;
@@ -22,55 +22,55 @@ pub enum RawFuzzInstruction {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModAddress {
-    AccountPublicKeyToAddress(FakeRawVal),
-    AddressToAccountPublicKey(FakeRawVal),
-    AddressToContractId(FakeRawVal),
-    ContractIdToAddress(FakeRawVal),
-    RequireAuth(FakeRawVal),
-    RequireAuthForArgs(FakeRawVal, FakeRawVal),
+    AccountPublicKeyToAddress(FakeVal),
+    AddressToAccountPublicKey(FakeVal),
+    AddressToContractId(FakeVal),
+    ContractIdToAddress(FakeVal),
+    RequireAuth(FakeVal),
+    RequireAuthForArgs(FakeVal, FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModBuf {
-    BytesAppend(FakeRawVal, FakeRawVal),
-    BytesBack(FakeRawVal),
-    BytesCopyFromLinearMemory(FakeRawVal, u32, u32, u32),
-    BytesCopyToLinearMemory(FakeRawVal, u32, u32, u32),
-    BytesDel(FakeRawVal, u32),
-    BytesFront(FakeRawVal),
-    BytesGet(FakeRawVal, u32),
-    BytesInsert(FakeRawVal, u32, u32),
-    BytesLen(FakeRawVal),
+    BytesAppend(FakeVal, FakeVal),
+    BytesBack(FakeVal),
+    BytesCopyFromLinearMemory(FakeVal, u32, u32, u32),
+    BytesCopyToLinearMemory(FakeVal, u32, u32, u32),
+    BytesDel(FakeVal, u32),
+    BytesFront(FakeVal),
+    BytesGet(FakeVal, u32),
+    BytesInsert(FakeVal, u32, u32),
+    BytesLen(FakeVal),
     BytesNew,
     BytesNewFromLinearMemory(u32, u32),
-    BytesPop(FakeRawVal),
-    BytesPush(FakeRawVal, u32),
-    BytesPut(FakeRawVal, u32, u32),
-    BytesSlice(FakeRawVal, u32, u32),
-    DeserializeFromBytes(FakeRawVal),
-    SerializeToBytes(FakeRawVal),
-    StringCopyToLinearMemory(FakeRawVal, u32, u32, u32),
-    StringLen(FakeRawVal),
+    BytesPop(FakeVal),
+    BytesPush(FakeVal, u32),
+    BytesPut(FakeVal, u32, u32),
+    BytesSlice(FakeVal, u32, u32),
+    DeserializeFromBytes(FakeVal),
+    SerializeToBytes(FakeVal),
+    StringCopyToLinearMemory(FakeVal, u32, u32, u32),
+    StringLen(FakeVal),
     StringNewFromLinearMemory(u32, u32),
-    SymbolCopyToLinearMemory(FakeRawVal, u32, u32, u32),
-    SymbolIndexInLinearMemory(FakeRawVal, u32, u32),
-    SymbolLen(FakeRawVal),
+    SymbolCopyToLinearMemory(FakeVal, u32, u32, u32),
+    SymbolIndexInLinearMemory(FakeVal, u32, u32),
+    SymbolLen(FakeVal),
     SymbolNewFromLinearMemory(u32, u32),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModCall {
-    Call(FakeRawVal, FakeRawVal, FakeRawVal),
-    TryCall(FakeRawVal, FakeRawVal, FakeRawVal),
+    Call(FakeVal, FakeVal, FakeVal),
+    TryCall(FakeVal, FakeVal, FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModContext {
-    ContractEvent(FakeRawVal, FakeRawVal),
-    FailWithError(FakeRawVal),
+    ContractEvent(FakeVal, FakeVal),
+    FailWithError(FakeVal),
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -80,14 +80,14 @@ pub enum RawModContext {
     GetLedgerTimestamp,
     GetLedgerVersion,
     LogFromLinearMemory(u32, u32, u32, u32),
-    ObjCmp(FakeRawVal, FakeRawVal),
+    ObjCmp(FakeVal, FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModCrypto {
-    ComputeHashSha256(FakeRawVal),
-    VerifySigEd25519(FakeRawVal, FakeRawVal, FakeRawVal),
+    ComputeHashSha256(FakeVal),
+    VerifySigEd25519(FakeVal, FakeVal, FakeVal),
 }
 
 #[contracttype]
@@ -99,85 +99,85 @@ pub enum RawModInt {
     ObjFromU64(u64),
     ObjFromU128Pieces(u64, u64),
     ObjFromU256Pieces(u64, u64, u64, u64),
-    ObjToI64(FakeRawVal),
-    ObjToI128Hi64(FakeRawVal),
-    ObjToI128Lo64(FakeRawVal),
-    ObjToI256HiHi(FakeRawVal),
-    ObjToI256HiLo(FakeRawVal),
-    ObjToI256LoHi(FakeRawVal),
-    ObjToI256LoLo(FakeRawVal),
-    ObjToU64(FakeRawVal),
-    ObjToU128Hi64(FakeRawVal),
-    ObjToU128Lo64(FakeRawVal),
-    ObjToU256HiHi(FakeRawVal),
-    ObjToU256HiLo(FakeRawVal),
-    ObjToU256LoHi(FakeRawVal),
-    ObjToU256LoLo(FakeRawVal),
+    ObjToI64(FakeVal),
+    ObjToI128Hi64(FakeVal),
+    ObjToI128Lo64(FakeVal),
+    ObjToI256HiHi(FakeVal),
+    ObjToI256HiLo(FakeVal),
+    ObjToI256LoHi(FakeVal),
+    ObjToI256LoLo(FakeVal),
+    ObjToU64(FakeVal),
+    ObjToU128Hi64(FakeVal),
+    ObjToU128Lo64(FakeVal),
+    ObjToU256HiHi(FakeVal),
+    ObjToU256HiLo(FakeVal),
+    ObjToU256LoHi(FakeVal),
+    ObjToU256LoLo(FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModLedger {
-    CreateAssetContract(FakeRawVal),
-    CreateContract(FakeRawVal, FakeRawVal, FakeRawVal),
-    DelContractData(FakeRawVal),
-    GetContractData(FakeRawVal),
-    HasContractData(FakeRawVal),
-    PutContractData(FakeRawVal, FakeRawVal),
-    UpdateCurrentContractWasm(FakeRawVal),
-    UploadWasm(FakeRawVal),
+    CreateAssetContract(FakeVal),
+    CreateContract(FakeVal, FakeVal, FakeVal),
+    DelContractData(FakeVal),
+    GetContractData(FakeVal),
+    HasContractData(FakeVal),
+    PutContractData(FakeVal, FakeVal),
+    UpdateCurrentContractWasm(FakeVal),
+    UploadWasm(FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModMap {
-    MapDel(FakeRawVal, FakeRawVal),
-    MapGet(FakeRawVal, FakeRawVal),
-    MapHas(FakeRawVal, FakeRawVal),
-    MapKeys(FakeRawVal),
-    MapLen(FakeRawVal),
-    MapMaxKey(FakeRawVal),
-    MapMinKey(FakeRawVal),
+    MapDel(FakeVal, FakeVal),
+    MapGet(FakeVal, FakeVal),
+    MapHas(FakeVal, FakeVal),
+    MapKeys(FakeVal),
+    MapLen(FakeVal),
+    MapMaxKey(FakeVal),
+    MapMinKey(FakeVal),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
-    MapNextKey(FakeRawVal, FakeRawVal),
-    MapPrevKey(FakeRawVal, FakeRawVal),
-    MapPut(FakeRawVal, FakeRawVal, FakeRawVal),
-    MapUnpackToLinearMemory(FakeRawVal, u32, u32, u32),
-    MapValues(FakeRawVal),
+    MapNextKey(FakeVal, FakeVal),
+    MapPrevKey(FakeVal, FakeVal),
+    MapPut(FakeVal, FakeVal, FakeVal),
+    MapUnpackToLinearMemory(FakeVal, u32, u32, u32),
+    MapValues(FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModPrng {
     PrngBytesNew(u32),
-    PrngReseed(FakeRawVal),
+    PrngReseed(FakeVal),
     PrngU64InInclusiveRange(u64, u64),
-    PrngVecShuffle(FakeRawVal),
+    PrngVecShuffle(FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModVec {
-    VecAppend(FakeRawVal, FakeRawVal),
-    VecBack(FakeRawVal),
-    VecBinarySearch(FakeRawVal, FakeRawVal),
-    VecDel(FakeRawVal, u32),
-    VecFirstIndexOf(FakeRawVal, FakeRawVal),
-    VecFront(FakeRawVal),
-    VecGet(FakeRawVal, u32),
-    VecInsert(FakeRawVal, u32, FakeRawVal),
-    VecLastIndexOf(FakeRawVal, FakeRawVal),
-    VecLen(FakeRawVal),
-    VecNew(FakeRawVal),
+    VecAppend(FakeVal, FakeVal),
+    VecBack(FakeVal),
+    VecBinarySearch(FakeVal, FakeVal),
+    VecDel(FakeVal, u32),
+    VecFirstIndexOf(FakeVal, FakeVal),
+    VecFront(FakeVal),
+    VecGet(FakeVal, u32),
+    VecInsert(FakeVal, u32, FakeVal),
+    VecLastIndexOf(FakeVal, FakeVal),
+    VecLen(FakeVal),
+    VecNew(FakeVal),
     VecNewFromLinearMemory(u32, u32),
-    VecPopBack(FakeRawVal),
-    VecPopFront(FakeRawVal),
-    VecPushBack(FakeRawVal, FakeRawVal),
-    VecPushFront(FakeRawVal, FakeRawVal),
-    VecPut(FakeRawVal, u32, FakeRawVal),
-    VecSlice(FakeRawVal, u32, u32),
-    VecUnpackToLinearMemory(FakeRawVal, u32, u32),
+    VecPopBack(FakeVal),
+    VecPopFront(FakeVal),
+    VecPushBack(FakeVal, FakeVal),
+    VecPushFront(FakeVal, FakeVal),
+    VecPut(FakeVal, u32, FakeVal),
+    VecSlice(FakeVal, u32, u32),
+    VecUnpackToLinearMemory(FakeVal, u32, u32),
 }
 
 impl RawFuzzInstruction {
@@ -384,7 +384,7 @@ impl RawFuzzInstruction {
                     syscalls::context::get_current_contract_address();
                 },
                 RawModContext::GetCurrentContractId => unsafe {
-                    syscalls::context::get_current_contract_id();
+//                    syscalls::context::get_current_contract_id();
                 },
                 RawModContext::GetInvokingContract => unsafe {
                     syscalls::context::get_invoking_contract();
@@ -514,21 +514,25 @@ impl RawFuzzInstruction {
                     syscalls::ledger::create_contract(v_0, v_1, v_2);
                 },
                 RawModLedger::DelContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::ledger::del_contract_data(v);
+//                    let v = mem::transmute(v.0);
+                    // todo: an argument of type `StorageType` is missing
+//                    syscalls::ledger::del_contract_data(v);
                 },
                 RawModLedger::GetContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::ledger::get_contract_data(v);
+//                    let v = mem::transmute(v.0);
+                    // todo: an argument of type `StorageType` is missing
+//                    syscalls::ledger::get_contract_data(v);
                 },
                 RawModLedger::HasContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::ledger::has_contract_data(v);
+//                    let v = mem::transmute(v.0);
+                    // todo
+//                    syscalls::ledger::has_contract_data(v);
                 },
                 RawModLedger::PutContractData(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    syscalls::ledger::put_contract_data(v_0, v_1);
+//                    let v_0 = mem::transmute(v_0.0);
+//                    let v_1 = mem::transmute(v_1.0);
+                    // two arguments of type `StorageType` and `soroban_sdk::Val` are missing
+//                    syscalls::ledger::put_contract_data(v_0, v_1);
                 },
                 RawModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = mem::transmute(v.0);

@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contractimpl, contracttype, Env, RawVal};
+use soroban_sdk::{contractimpl, contracttype, Env, Val};
 
 pub mod raw;
 pub mod typed;
@@ -11,15 +11,15 @@ use typed::TypedFuzzInstruction;
 #[contracttype]
 #[derive(Copy, Clone, Debug)]
 #[repr(transparent)]
-pub struct FakeRawVal(pub u64);
+pub struct FakeVal(pub u64);
 
-impl FakeRawVal {
-    pub fn from_rawval(v: RawVal) -> FakeRawVal {
-        FakeRawVal(v.get_payload())
+impl FakeVal {
+    pub fn from_val(v: Val) -> FakeVal {
+        FakeVal(v.get_payload())
     }
 
-    pub fn to_rawval(self) -> RawVal {
-        RawVal::from_payload(self.0)
+    pub fn to_val(self) -> Val {
+        Val::from_payload(self.0)
     }
 }
 
@@ -109,9 +109,9 @@ mod syscalls {
                 $(#[$mod_attr])*
                 pub mod $mod_id {
                     #[allow(unused_imports)]
-                    use soroban_env_common::{RawVal, Object, Symbol, MapObject, VecObject, BytesObject, Error};
+                    use soroban_env_common::{Val, Object, Symbol, MapObject, VecObject, BytesObject, Error};
                     #[allow(unused_imports)]
-                    use soroban_env_common::{I128Object, I256Object, I64Object, I64Val, U128Object, U256Object, U32Val, U64Object, U64Val};
+                    use soroban_env_common::{I128Object, I256Object, I64Object, I64Val, U128Object, U256Object, U32Val, U64Object, U64Val, StorageType, TimepointObject, DurationObject};
                     #[allow(unused_imports)]
                     use soroban_env_common::{Void,AddressObject,SymbolObject,StringObject,Bool};
                     #[link(wasm_import_module = $mod_str)]

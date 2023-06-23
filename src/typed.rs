@@ -1,11 +1,11 @@
-use crate::{syscalls, FakeRawVal};
+use crate::{syscalls, FakeVal};
 use core::mem;
 use soroban_env_common::{
     BytesObject, I128Object, I256Object, I64Object, SymbolObject, U128Object, U256Object, U32Val,
     U64Object,
 };
 use soroban_sdk::contracttype;
-use soroban_sdk::{Address, Bytes, Env, Map, RawVal, String, Symbol, TryFromVal, Vec};
+use soroban_sdk::{Address, Bytes, Env, Map, Val, String, Symbol, TryFromVal, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug)]
@@ -31,7 +31,7 @@ pub enum TypedModAddress {
     AddressToContractId(Address),
     ContractIdToAddress(Bytes),
     RequireAuth(Address),
-    RequireAuthForArgs(Address, Vec<RawVal>),
+    RequireAuthForArgs(Address, Vec<Val>),
 }
 
 #[contracttype]
@@ -53,7 +53,7 @@ pub enum TypedModBuf {
     BytesPut(Bytes, u32, u32),
     BytesSlice(Bytes, u32, u32),
     DeserializeFromBytes(Bytes),
-    SerializeToBytes(FakeRawVal),
+    SerializeToBytes(FakeVal),
     StringCopyToLinearMemory(String, u32, u32, u32),
     StringLen(String),
     StringNewFromLinearMemory(u32, u32),
@@ -66,15 +66,15 @@ pub enum TypedModBuf {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModCall {
-    Call(Address, Symbol, Vec<RawVal>),
-    TryCall(Address, Symbol, Vec<RawVal>),
+    Call(Address, Symbol, Vec<Val>),
+    TryCall(Address, Symbol, Vec<Val>),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModContext {
-    ContractEvent(Vec<RawVal>, FakeRawVal),
-    FailWithError(FakeRawVal), // soroban_env_common::Error
+    ContractEvent(Vec<Val>, FakeVal),
+    FailWithError(FakeVal), // soroban_env_common::Error
     GetCurrentCallStack,
     GetCurrentContractAddress,
     GetCurrentContractId,
@@ -84,7 +84,7 @@ pub enum TypedModContext {
     GetLedgerTimestamp,
     GetLedgerVersion,
     LogFromLinearMemory(u32, u32, u32, u32),
-    ObjCmp(FakeRawVal, FakeRawVal),
+    ObjCmp(FakeVal, FakeVal),
 }
 
 #[contracttype]
@@ -106,17 +106,17 @@ pub enum TypedModInt {
     ObjToI64(i64),
     ObjToI128Hi64(i128),
     ObjToI128Lo64(i128),
-    ObjToI256HiHi(FakeRawVal),
-    ObjToI256HiLo(FakeRawVal),
-    ObjToI256LoHi(FakeRawVal),
-    ObjToI256LoLo(FakeRawVal),
+    ObjToI256HiHi(FakeVal),
+    ObjToI256HiLo(FakeVal),
+    ObjToI256LoHi(FakeVal),
+    ObjToI256LoLo(FakeVal),
     ObjToU64(u64),
     ObjToU128Hi64(u128),
     ObjToU128Lo64(u128),
-    ObjToU256HiHi(FakeRawVal),
-    ObjToU256HiLo(FakeRawVal),
-    ObjToU256LoHi(FakeRawVal),
-    ObjToU256LoLo(FakeRawVal),
+    ObjToU256HiHi(FakeVal),
+    ObjToU256HiLo(FakeVal),
+    ObjToU256LoHi(FakeVal),
+    ObjToU256LoLo(FakeVal),
 }
 
 #[contracttype]
@@ -124,10 +124,10 @@ pub enum TypedModInt {
 pub enum TypedModLedger {
     CreateAssetContract(Bytes),
     CreateContract(Address, Bytes, Bytes),
-    DelContractData(FakeRawVal),
-    GetContractData(FakeRawVal),
-    HasContractData(FakeRawVal),
-    PutContractData(FakeRawVal, FakeRawVal),
+    DelContractData(FakeVal),
+    GetContractData(FakeVal),
+    HasContractData(FakeVal),
+    PutContractData(FakeVal, FakeVal),
     UpdateCurrentContractWasm(Bytes),
     UploadWasm(Bytes),
 }
@@ -135,20 +135,20 @@ pub enum TypedModLedger {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModMap {
-    MapDel(Map<RawVal, RawVal>, FakeRawVal),
-    MapGet(Map<RawVal, RawVal>, FakeRawVal),
-    MapHas(Map<RawVal, RawVal>, FakeRawVal),
-    MapKeys(Map<RawVal, RawVal>),
-    MapLen(Map<RawVal, RawVal>),
-    MapMaxKey(Map<RawVal, RawVal>),
-    MapMinKey(Map<RawVal, RawVal>),
+    MapDel(Map<Val, Val>, FakeVal),
+    MapGet(Map<Val, Val>, FakeVal),
+    MapHas(Map<Val, Val>, FakeVal),
+    MapKeys(Map<Val, Val>),
+    MapLen(Map<Val, Val>),
+    MapMaxKey(Map<Val, Val>),
+    MapMinKey(Map<Val, Val>),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
-    MapNextKey(Map<RawVal, RawVal>, FakeRawVal),
-    MapPrevKey(Map<RawVal, RawVal>, FakeRawVal),
-    MapPut(Map<RawVal, RawVal>, FakeRawVal, FakeRawVal),
-    MapUnpackToLinearMemory(Map<RawVal, RawVal>, u32, u32, u32),
-    MapValues(Map<RawVal, RawVal>),
+    MapNextKey(Map<Val, Val>, FakeVal),
+    MapPrevKey(Map<Val, Val>, FakeVal),
+    MapPut(Map<Val, Val>, FakeVal, FakeVal),
+    MapUnpackToLinearMemory(Map<Val, Val>, u32, u32, u32),
+    MapValues(Map<Val, Val>),
 }
 
 #[contracttype]
@@ -157,31 +157,31 @@ pub enum TypedModPrng {
     PrngBytesNew(u32),
     PrngReseed(Bytes),
     PrngU64InInclusiveRange(u64, u64),
-    PrngVecShuffle(Vec<RawVal>),
+    PrngVecShuffle(Vec<Val>),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModVec {
-    VecAppend(Vec<RawVal>, Vec<RawVal>),
-    VecBack(Vec<RawVal>),
-    VecBinarySearch(Vec<RawVal>, FakeRawVal),
-    VecDel(Vec<RawVal>, u32),
-    VecFirstIndexOf(Vec<RawVal>, FakeRawVal),
-    VecFront(Vec<RawVal>),
-    VecGet(Vec<RawVal>, u32),
-    VecInsert(Vec<RawVal>, u32, FakeRawVal),
-    VecLastIndexOf(Vec<RawVal>, FakeRawVal),
-    VecLen(Vec<RawVal>),
-    VecNew(FakeRawVal),
+    VecAppend(Vec<Val>, Vec<Val>),
+    VecBack(Vec<Val>),
+    VecBinarySearch(Vec<Val>, FakeVal),
+    VecDel(Vec<Val>, u32),
+    VecFirstIndexOf(Vec<Val>, FakeVal),
+    VecFront(Vec<Val>),
+    VecGet(Vec<Val>, u32),
+    VecInsert(Vec<Val>, u32, FakeVal),
+    VecLastIndexOf(Vec<Val>, FakeVal),
+    VecLen(Vec<Val>),
+    VecNew(FakeVal),
     VecNewFromLinearMemory(u32, u32),
-    VecPopBack(Vec<RawVal>),
-    VecPopFront(Vec<RawVal>),
-    VecPushBack(Vec<RawVal>, FakeRawVal),
-    VecPushFront(Vec<RawVal>, FakeRawVal),
-    VecPut(Vec<RawVal>, u32, FakeRawVal),
-    VecSlice(Vec<RawVal>, u32, u32),
-    VecUnpackToLinearMemory(Vec<RawVal>, u32, u32),
+    VecPopBack(Vec<Val>),
+    VecPopFront(Vec<Val>),
+    VecPushBack(Vec<Val>, FakeVal),
+    VecPushFront(Vec<Val>, FakeVal),
+    VecPut(Vec<Val>, u32, FakeVal),
+    VecSlice(Vec<Val>, u32, u32),
+    VecUnpackToLinearMemory(Vec<Val>, u32, u32),
 }
 
 impl TypedFuzzInstruction {
@@ -341,8 +341,8 @@ impl TypedFuzzInstruction {
                     let v_0 = v_0.to_val();
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
-
-                    syscalls::buf::symbol_index_in_linear_memory(v_0, v_1, v_2);
+// todo
+//                    syscalls::buf::symbol_index_in_linear_memory(v_0, v_1, v_2);
                 },
                 TypedModBuf::SymbolLen(v) => unsafe {
                     let v = v.to_val();
@@ -361,15 +361,15 @@ impl TypedFuzzInstruction {
                     let v_0 = v_0.to_object();
                     let v_1 = v_1.to_val();
                     let v_2 = v_2.to_object();
-
-                    syscalls::call::call(v_0, v_1, v_2);
+// todo
+//                    syscalls::call::call(v_0, v_1, v_2);
                 },
                 TypedModCall::TryCall(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
                     let v_1 = v_1.to_val();
                     let v_2 = v_2.to_object();
-
-                    syscalls::call::try_call(v_0, v_1, v_2);
+// todo
+//                    syscalls::call::try_call(v_0, v_1, v_2);
                 },
             },
             Context(v) => match v {
@@ -390,7 +390,7 @@ impl TypedFuzzInstruction {
                     syscalls::context::get_current_contract_address();
                 },
                 TypedModContext::GetCurrentContractId => unsafe {
-                    syscalls::context::get_current_contract_id();
+//                    syscalls::context::get_current_contract_id();
                 },
                 TypedModContext::GetInvokingContract => unsafe {
                     syscalls::context::get_invoking_contract();
@@ -452,17 +452,17 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_from_u256_pieces(v_0, v_1, v_2, v_3);
                 },
                 TypedModInt::ObjToI64(v) => unsafe {
-                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = Val::try_from_val(env, &v).unwrap();
                     let v = I64Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i64(v);
                 },
                 TypedModInt::ObjToI128Hi64(v) => unsafe {
-                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = Val::try_from_val(env, &v).unwrap();
                     let v = I128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i128_hi64(v);
                 },
                 TypedModInt::ObjToI128Lo64(v) => unsafe {
-                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = Val::try_from_val(env, &v).unwrap();
                     let v = I128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i128_lo64(v);
                 },
@@ -483,17 +483,17 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_to_i256_lo_lo(v);
                 },
                 TypedModInt::ObjToU64(v) => unsafe {
-                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = Val::try_from_val(env, &v).unwrap();
                     let v = U64Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u64(v);
                 },
                 TypedModInt::ObjToU128Hi64(v) => unsafe {
-                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = Val::try_from_val(env, &v).unwrap();
                     let v = U128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u128_hi64(v);
                 },
                 TypedModInt::ObjToU128Lo64(v) => unsafe {
-                    let v = RawVal::try_from_val(env, &v).unwrap();
+                    let v = Val::try_from_val(env, &v).unwrap();
                     let v = U128Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u128_lo64(v);
                 },
@@ -526,21 +526,25 @@ impl TypedFuzzInstruction {
                     syscalls::ledger::create_contract(v_0, v_1, v_2);
                 },
                 TypedModLedger::DelContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::ledger::del_contract_data(v);
+                    // todo
+//                    let v = mem::transmute(v.0);
+//                    syscalls::ledger::del_contract_data(v);
                 },
                 TypedModLedger::GetContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::ledger::get_contract_data(v);
+// todo
+                    //                    let v = mem::transmute(v.0);
+//                    syscalls::ledger::get_contract_data(v);
                 },
                 TypedModLedger::HasContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::ledger::has_contract_data(v);
+// todo
+                    //                    let v = mem::transmute(v.0);
+//                    syscalls::ledger::has_contract_data(v);
                 },
                 TypedModLedger::PutContractData(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    syscalls::ledger::put_contract_data(v_0, v_1);
+// todo
+//                    let v_0 = mem::transmute(v_0.0);
+  //                  let v_1 = mem::transmute(v_1.0);
+    //                syscalls::ledger::put_contract_data(v_0, v_1);
                 },
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = BytesObject::from(v);
