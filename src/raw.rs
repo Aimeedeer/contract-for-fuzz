@@ -96,6 +96,17 @@ pub enum RawModCrypto {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModInt {
+    DurationObjFromU64(u64),
+    DurationObjToU64(FakeVal),
+    I256Add(FakeVal, FakeVal),
+    I256Div(FakeVal, FakeVal),
+    I256Mul(FakeVal, FakeVal),
+    I256ObjFromBeBytes(FakeVal),
+    I256ObjToBeBytes(FakeVal),
+    I256Pow(FakeVal, u32),
+    I256Shl(FakeVal, u32),
+    I256Shr(FakeVal, u32),
+    I256Sub(FakeVal, FakeVal),
     ObjFromI64(i64),
     ObjFromI128Pieces(i64, u64),
     ObjFromI256Pieces(i64, u64, u64, u64),
@@ -116,6 +127,12 @@ pub enum RawModInt {
     ObjToU256HiLo(FakeVal),
     ObjToU256LoHi(FakeVal),
     ObjToU256LoLo(FakeVal),
+    TimepointObjFromU64(u64),
+    TimepointObjToU64(FakeVal),
+    U256Pow(FakeVal, u32),
+    U256Shl(FakeVal, u32),
+    U256Shr(FakeVal, u32),
+    U256Sub(FakeVal, FakeVal),
 }
 
 #[contracttype]
@@ -444,6 +461,56 @@ impl RawFuzzInstruction {
                 },
             },
             Int(v) => match v {
+                RawModInt::DurationObjFromU64(v) => unsafe {
+                    syscalls::int::duration_obj_from_u64(v);
+                },
+                RawModInt::DurationObjToU64(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::duration_obj_to_u64(v);
+                },
+                RawModInt::I256Add(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::i256_add(v_0, v_1);
+                },
+                RawModInt::I256Div(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::i256_div(v_0, v_1);
+                },
+                RawModInt::I256Mul(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::i256_mul(v_0, v_1);
+                },
+                RawModInt::I256ObjFromBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::i256_obj_from_be_bytes(v);
+                },
+                RawModInt::I256ObjToBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::i256_obj_to_be_bytes(v);
+                },
+                RawModInt::I256Pow(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::i256_pow(v_0, v_1);
+                },
+                RawModInt::I256Shl(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::i256_shl(v_0, v_1);
+                },
+                RawModInt::I256Shr(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::i256_shr(v_0, v_1);
+                },
+                RawModInt::I256Sub(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::i256_sub(v_0, v_1);
+                },
                 RawModInt::ObjFromI64(v) => unsafe {
                     syscalls::int::obj_from_i64(v);
                 },
@@ -517,6 +584,33 @@ impl RawFuzzInstruction {
                 RawModInt::ObjToU256LoLo(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::int::obj_to_u256_lo_lo(v);
+                },
+                RawModInt::TimepointObjFromU64(v) => unsafe {
+                    syscalls::int::timepoint_obj_from_u64(v);
+                },
+                RawModInt::TimepointObjToU64(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::timepoint_obj_to_u64(v);
+                },
+                RawModInt::U256Pow(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::u256_pow(v_0, v_1);
+                },
+                RawModInt::U256Shl(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::u256_shl(v_0, v_1);
+                },
+                RawModInt::U256Shr(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::u256_shr(v_0, v_1);
+                },
+                RawModInt::U256Sub(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::u256_sub(v_0, v_1);
                 },
             },
             Ledger(v) => match v {

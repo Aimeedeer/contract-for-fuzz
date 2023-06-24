@@ -188,6 +188,38 @@ pub enum TypedModCryptoPrototype {
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum TypedModIntPrototype {
+    DurationObjFromU64(<u64 as SorobanArbitrary>::Prototype),
+    DurationObjToU64(<Val as SorobanArbitrary>::Prototype),
+    I256Add(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
+    I256Div(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
+    I256Mul(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
+    I256ObjFromBeBytes(<Bytes as SorobanArbitrary>::Prototype),
+    I256ObjToBeBytes(<Val as SorobanArbitrary>::Prototype),
+    I256Pow(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    I256Shl(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    I256Shr(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    I256Sub(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
     ObjFromI64(<i64 as SorobanArbitrary>::Prototype),
     ObjFromI128Pieces(
         <i64 as SorobanArbitrary>::Prototype,
@@ -224,6 +256,24 @@ pub enum TypedModIntPrototype {
     ObjToU256HiLo(<Val as SorobanArbitrary>::Prototype),
     ObjToU256LoHi(<Val as SorobanArbitrary>::Prototype),
     ObjToU256LoLo(<Val as SorobanArbitrary>::Prototype),
+    TimepointObjFromU64(<u64 as SorobanArbitrary>::Prototype),
+    TimepointObjToU64(<Val as SorobanArbitrary>::Prototype),
+    U256Pow(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    U256Shl(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    U256Shr(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    U256Sub(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
 }
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
@@ -593,6 +643,78 @@ impl TypedFuzzInstructionPrototype {
                 }
             },
             TypedFuzzInstructionPrototype::Int(v) => match v {
+                TypedModIntPrototype::DurationObjFromU64(v) => {
+                    TypedFuzzInstruction::Int(TypedModInt::DurationObjFromU64(*v))
+                }
+                TypedModIntPrototype::DurationObjToU64(v) => {
+                    let v = Val::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::DurationObjToU64(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
+                TypedModIntPrototype::I256Add(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Add(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                    ))
+                }
+                TypedModIntPrototype::I256Div(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Div(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                    ))
+                }
+                TypedModIntPrototype::I256Mul(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Mul(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                    ))
+                }
+                TypedModIntPrototype::I256ObjFromBeBytes(v) => {
+                    let v = Bytes::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::I256ObjFromBeBytes(v))
+                }
+                TypedModIntPrototype::I256ObjToBeBytes(v) => {
+                    let v = Val::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::I256ObjToBeBytes(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
+                TypedModIntPrototype::I256Pow(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Pow(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
+                TypedModIntPrototype::I256Shl(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Shl(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
+                TypedModIntPrototype::I256Shr(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Shr(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
+                TypedModIntPrototype::I256Sub(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    TypedFuzzInstruction::Int(TypedModInt::I256Sub(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                    ))
+                }
                 TypedModIntPrototype::ObjFromI64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjFromI64(*v))
                 }
@@ -664,6 +786,44 @@ impl TypedFuzzInstructionPrototype {
                 TypedModIntPrototype::ObjToU256LoLo(v) => {
                     let v = Val::from_val(env, v);
                     TypedFuzzInstruction::Int(TypedModInt::ObjToU256LoLo(FakeVal(v.get_payload())))
+                }
+                TypedModIntPrototype::TimepointObjFromU64(v) => {
+                    TypedFuzzInstruction::Int(TypedModInt::TimepointObjFromU64(*v))
+                }
+                TypedModIntPrototype::TimepointObjToU64(v) => {
+                    let v = Val::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::TimepointObjToU64(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
+                TypedModIntPrototype::U256Pow(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Int(TypedModInt::U256Pow(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
+                TypedModIntPrototype::U256Shl(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Int(TypedModInt::U256Shl(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
+                TypedModIntPrototype::U256Shr(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Int(TypedModInt::U256Shr(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
+                TypedModIntPrototype::U256Sub(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    TypedFuzzInstruction::Int(TypedModInt::U256Sub(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                    ))
                 }
             },
             TypedFuzzInstructionPrototype::Ledger(v) => match v {

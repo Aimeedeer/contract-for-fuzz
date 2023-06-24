@@ -1,8 +1,8 @@
 use crate::{syscalls, FakeVal};
 use core::mem;
 use soroban_env_common::{
-    BytesObject, I128Object, I256Object, I64Object, StorageType, SymbolObject, U128Object,
-    U256Object, U32Val, U64Object,
+    BytesObject, DurationObject, I128Object, I256Object, I64Object, StorageType, SymbolObject,
+    TimepointObject, U128Object, U256Object, U32Val, U64Object,
 };
 use soroban_sdk::contracttype;
 use soroban_sdk::{Address, Bytes, Env, Map, String, Symbol, TryFromVal, Val, Vec};
@@ -100,6 +100,17 @@ pub enum TypedModCrypto {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModInt {
+    DurationObjFromU64(u64),
+    DurationObjToU64(FakeVal),
+    I256Add(FakeVal, FakeVal),
+    I256Div(FakeVal, FakeVal),
+    I256Mul(FakeVal, FakeVal),
+    I256ObjFromBeBytes(Bytes),
+    I256ObjToBeBytes(FakeVal),
+    I256Pow(FakeVal, u32),
+    I256Shl(FakeVal, u32),
+    I256Shr(FakeVal, u32),
+    I256Sub(FakeVal, FakeVal),
     ObjFromI64(i64),
     ObjFromI128Pieces(i64, u64),
     ObjFromI256Pieces(i64, u64, u64, u64),
@@ -120,6 +131,12 @@ pub enum TypedModInt {
     ObjToU256HiLo(FakeVal),
     ObjToU256LoHi(FakeVal),
     ObjToU256LoLo(FakeVal),
+    TimepointObjFromU64(u64),
+    TimepointObjToU64(FakeVal),
+    U256Pow(FakeVal, u32),
+    U256Shl(FakeVal, u32),
+    U256Shr(FakeVal, u32),
+    U256Sub(FakeVal, FakeVal),
 }
 
 #[contracttype]
@@ -447,6 +464,69 @@ impl TypedFuzzInstruction {
                 },
             },
             Int(v) => match v {
+                TypedModInt::DurationObjFromU64(v) => unsafe {
+                    syscalls::int::duration_obj_from_u64(v);
+                },
+                TypedModInt::DurationObjToU64(v) => unsafe {
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = DurationObject::try_from(&v).unwrap();
+                    syscalls::int::duration_obj_to_u64(v);
+                },
+                TypedModInt::I256Add(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = I256Object::try_from(&v_1).unwrap();
+                    syscalls::int::i256_add(v_0, v_1);
+                },
+                TypedModInt::I256Div(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = I256Object::try_from(&v_1).unwrap();
+                    syscalls::int::i256_div(v_0, v_1);
+                },
+                TypedModInt::I256Mul(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = I256Object::try_from(&v_1).unwrap();
+                    syscalls::int::i256_mul(v_0, v_1);
+                },
+                TypedModInt::I256ObjFromBeBytes(v) => unsafe {
+                    let v = BytesObject::from(v);
+                    syscalls::int::i256_obj_from_be_bytes(v);
+                },
+                TypedModInt::I256ObjToBeBytes(v) => unsafe {
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = I256Object::try_from(&v).unwrap();
+                    syscalls::int::i256_obj_to_be_bytes(v);
+                },
+                TypedModInt::I256Pow(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::i256_pow(v_0, v_1);
+                },
+                TypedModInt::I256Shl(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::i256_shl(v_0, v_1);
+                },
+                TypedModInt::I256Shr(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::i256_shr(v_0, v_1);
+                },
+                TypedModInt::I256Sub(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = I256Object::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = I256Object::try_from(&v_1).unwrap();
+                    syscalls::int::i256_sub(v_0, v_1);
+                },
                 TypedModInt::ObjFromI64(v) => unsafe {
                     syscalls::int::obj_from_i64(v);
                 },
@@ -481,19 +561,23 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_to_i128_lo64(v);
                 },
                 TypedModInt::ObjToI256HiHi(v) => unsafe {
-                    let v = I256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = I256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i256_hi_hi(v);
                 },
                 TypedModInt::ObjToI256HiLo(v) => unsafe {
-                    let v = I256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = I256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i256_hi_lo(v);
                 },
                 TypedModInt::ObjToI256LoHi(v) => unsafe {
-                    let v = I256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = I256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i256_lo_hi(v);
                 },
                 TypedModInt::ObjToI256LoLo(v) => unsafe {
-                    let v = I256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = I256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_i256_lo_lo(v);
                 },
                 TypedModInt::ObjToU64(v) => unsafe {
@@ -512,20 +596,57 @@ impl TypedFuzzInstruction {
                     syscalls::int::obj_to_u128_lo64(v);
                 },
                 TypedModInt::ObjToU256HiHi(v) => unsafe {
-                    let v = U256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = U256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u256_hi_hi(v);
                 },
                 TypedModInt::ObjToU256HiLo(v) => unsafe {
-                    let v = U256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = U256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u256_hi_lo(v);
                 },
                 TypedModInt::ObjToU256LoHi(v) => unsafe {
-                    let v = U256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = U256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u256_lo_hi(v);
                 },
                 TypedModInt::ObjToU256LoLo(v) => unsafe {
-                    let v = U256Object::from(mem::transmute(v.0));
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = U256Object::try_from(&v).unwrap();
                     syscalls::int::obj_to_u256_lo_lo(v);
+                },
+                TypedModInt::TimepointObjFromU64(v) => unsafe {
+                    syscalls::int::timepoint_obj_from_u64(v);
+                },
+                TypedModInt::TimepointObjToU64(v) => unsafe {
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = TimepointObject::try_from(&v).unwrap();
+                    syscalls::int::timepoint_obj_to_u64(v);
+                },
+                TypedModInt::U256Pow(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Object::try_from(&v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::u256_pow(v_0, v_1);
+                },
+                TypedModInt::U256Shl(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Object::try_from(&v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::u256_shl(v_0, v_1);
+                },
+                TypedModInt::U256Shr(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Object::try_from(&v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::int::u256_shr(v_0, v_1);
+                },
+                TypedModInt::U256Sub(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Object::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = U256Object::try_from(&v_1).unwrap();
+                    syscalls::int::u256_sub(v_0, v_1);
                 },
             },
             Ledger(v) => match v {
