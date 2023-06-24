@@ -152,7 +152,6 @@ pub enum TypedModContextPrototype {
     FailWithError(<Val as SorobanArbitrary>::Prototype),
     GetCurrentCallStack,
     GetCurrentContractAddress,
-    GetCurrentContractId,
     GetInvokingContract,
     GetLedgerNetworkId,
     GetLedgerSequence,
@@ -595,9 +594,6 @@ impl TypedFuzzInstructionPrototype {
                 }
                 TypedModContextPrototype::GetCurrentContractAddress => {
                     TypedFuzzInstruction::Context(TypedModContext::GetCurrentContractAddress)
-                }
-                TypedModContextPrototype::GetCurrentContractId => {
-                    TypedFuzzInstruction::Context(TypedModContext::GetCurrentContractId)
                 }
                 TypedModContextPrototype::GetInvokingContract => {
                     TypedFuzzInstruction::Context(TypedModContext::GetInvokingContract)

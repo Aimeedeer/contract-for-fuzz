@@ -151,7 +151,6 @@ pub enum RawModContextPrototype {
     FailWithError(<Val as SorobanArbitrary>::Prototype),
     GetCurrentCallStack,
     GetCurrentContractAddress,
-    GetCurrentContractId,
     GetInvokingContract,
     GetLedgerNetworkId,
     GetLedgerSequence,
@@ -649,9 +648,6 @@ impl RawFuzzInstructionPrototype {
                 }
                 RawModContextPrototype::GetCurrentContractAddress => {
                     RawFuzzInstruction::Context(RawModContext::GetCurrentContractAddress)
-                }
-                RawModContextPrototype::GetCurrentContractId => {
-                    RawFuzzInstruction::Context(RawModContext::GetCurrentContractId)
                 }
                 RawModContextPrototype::GetInvokingContract => {
                     RawFuzzInstruction::Context(RawModContext::GetInvokingContract)

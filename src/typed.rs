@@ -74,10 +74,9 @@ pub enum TypedModCall {
 #[derive(Clone, Debug)]
 pub enum TypedModContext {
     ContractEvent(Vec<Val>, FakeVal),
-    FailWithError(FakeVal), // soroban_env_common::Error
+    FailWithError(FakeVal),
     GetCurrentCallStack,
     GetCurrentContractAddress,
-    GetCurrentContractId,
     GetInvokingContract,
     GetLedgerNetworkId,
     GetLedgerSequence,
@@ -411,9 +410,6 @@ impl TypedFuzzInstruction {
                 },
                 TypedModContext::GetCurrentContractAddress => unsafe {
                     syscalls::context::get_current_contract_address();
-                },
-                TypedModContext::GetCurrentContractId => unsafe {
-                    //                    syscalls::context::get_current_contract_id();
                 },
                 TypedModContext::GetInvokingContract => unsafe {
                     syscalls::context::get_invoking_contract();

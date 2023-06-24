@@ -74,7 +74,6 @@ pub enum RawModContext {
     FailWithError(FakeVal),
     GetCurrentCallStack,
     GetCurrentContractAddress,
-    GetCurrentContractId,
     GetInvokingContract,
     GetLedgerNetworkId,
     GetLedgerSequence,
@@ -409,9 +408,6 @@ impl RawFuzzInstruction {
                 },
                 RawModContext::GetCurrentContractAddress => unsafe {
                     syscalls::context::get_current_contract_address();
-                },
-                RawModContext::GetCurrentContractId => unsafe {
-                    //                    syscalls::context::get_current_contract_id();
                 },
                 RawModContext::GetInvokingContract => unsafe {
                     syscalls::context::get_invoking_contract();
