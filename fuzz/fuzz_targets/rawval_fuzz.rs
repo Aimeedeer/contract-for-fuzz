@@ -171,7 +171,13 @@ pub enum RawModContextPrototype {
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModCryptoPrototype {
+    ComputeHashKeccak256(<Val as SorobanArbitrary>::Prototype),
     ComputeHashSha256(<Val as SorobanArbitrary>::Prototype),
+    RecoverKeyEcdsaSecp256k1(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
     VerifySigEd25519(
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
@@ -618,11 +624,27 @@ impl RawFuzzInstructionPrototype {
                 }
             },
             RawFuzzInstructionPrototype::Crypto(v) => match v {
+                RawModCryptoPrototype::ComputeHashKeccak256(v) => {
+                    let v = Val::from_val(env, v);
+                    RawFuzzInstruction::Crypto(RawModCrypto::ComputeHashKeccak256(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
                 RawModCryptoPrototype::ComputeHashSha256(v) => {
                     let v = Val::from_val(env, v);
                     RawFuzzInstruction::Crypto(RawModCrypto::ComputeHashSha256(FakeVal(
                         v.get_payload(),
                     )))
+                }
+                RawModCryptoPrototype::RecoverKeyEcdsaSecp256k1(v_0, v_1, v_2) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    let v_2 = Val::from_val(env, v_2);
+                    RawFuzzInstruction::Crypto(RawModCrypto::RecoverKeyEcdsaSecp256k1(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                        FakeVal(v_2.get_payload()),
+                    ))
                 }
                 RawModCryptoPrototype::VerifySigEd25519(v_0, v_1, v_2) => {
                     let v_0 = Val::from_val(env, v_0);

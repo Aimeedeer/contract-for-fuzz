@@ -87,7 +87,9 @@ pub enum RawModContext {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModCrypto {
+    ComputeHashKeccak256(FakeVal),
     ComputeHashSha256(FakeVal),
+    RecoverKeyEcdsaSecp256k1(FakeVal, FakeVal, FakeVal),
     VerifySigEd25519(FakeVal, FakeVal, FakeVal),
 }
 
@@ -420,9 +422,19 @@ impl RawFuzzInstruction {
                 },
             },
             Crypto(v) => match v {
+                RawModCrypto::ComputeHashKeccak256(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::crypto::compute_hash_keccak256(v);
+                },
                 RawModCrypto::ComputeHashSha256(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::crypto::compute_hash_sha256(v);
+                },
+                RawModCrypto::RecoverKeyEcdsaSecp256k1(v_0, v_1, v_2) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    let v_2 = mem::transmute(v_2.0);
+                    syscalls::crypto::recover_key_ecdsa_secp256k1(v_0, v_1, v_2);
                 },
                 RawModCrypto::VerifySigEd25519(v_0, v_1, v_2) => unsafe {
                     let v_0 = mem::transmute(v_0.0);

@@ -172,7 +172,13 @@ pub enum TypedModContextPrototype {
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum TypedModCryptoPrototype {
+    ComputeHashKeccak256(<Bytes as SorobanArbitrary>::Prototype),
     ComputeHashSha256(<Bytes as SorobanArbitrary>::Prototype),
+    RecoverKeyEcdsaSecp256k1(
+        <Bytes as SorobanArbitrary>::Prototype,
+        <Bytes as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
     VerifySigEd25519(
         <Bytes as SorobanArbitrary>::Prototype,
         <Bytes as SorobanArbitrary>::Prototype,
@@ -564,9 +570,20 @@ impl TypedFuzzInstructionPrototype {
                 }
             },
             TypedFuzzInstructionPrototype::Crypto(v) => match v {
+                TypedModCryptoPrototype::ComputeHashKeccak256(v) => {
+                    let v = Bytes::from_val(env, v);
+                    TypedFuzzInstruction::Crypto(TypedModCrypto::ComputeHashKeccak256(v))
+                }
                 TypedModCryptoPrototype::ComputeHashSha256(v) => {
                     let v = Bytes::from_val(env, v);
                     TypedFuzzInstruction::Crypto(TypedModCrypto::ComputeHashSha256(v))
+                }
+                TypedModCryptoPrototype::RecoverKeyEcdsaSecp256k1(v_0, v_1, v_2) => {
+                    let v_0 = Bytes::from_val(env, v_0);
+                    let v_1 = Bytes::from_val(env, v_1);
+                    TypedFuzzInstruction::Crypto(TypedModCrypto::RecoverKeyEcdsaSecp256k1(
+                        v_0, v_1, *v_2,
+                    ))
                 }
                 TypedModCryptoPrototype::VerifySigEd25519(v_0, v_1, v_2) => {
                     let v_0 = Bytes::from_val(env, v_0);

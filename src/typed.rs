@@ -91,7 +91,9 @@ pub enum TypedModContext {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModCrypto {
+    ComputeHashKeccak256(Bytes),
     ComputeHashSha256(Bytes),
+    RecoverKeyEcdsaSecp256k1(Bytes, Bytes, u32),
     VerifySigEd25519(Bytes, Bytes, Bytes),
 }
 
@@ -423,9 +425,19 @@ impl TypedFuzzInstruction {
                 },
             },
             Crypto(v) => match v {
+                TypedModCrypto::ComputeHashKeccak256(v) => unsafe {
+                    let v = BytesObject::from(v);
+                    syscalls::crypto::compute_hash_keccak256(v);
+                },
                 TypedModCrypto::ComputeHashSha256(v) => unsafe {
                     let v = BytesObject::from(v);
                     syscalls::crypto::compute_hash_sha256(v);
+                },
+                TypedModCrypto::RecoverKeyEcdsaSecp256k1(v_0, v_1, v_2) => unsafe {
+                    let v_0 = BytesObject::from(v_0);
+                    let v_1 = BytesObject::from(v_1);
+                    let v_2 = U32Val::from(v_2);
+                    syscalls::crypto::recover_key_ecdsa_secp256k1(v_0, v_1, v_2);
                 },
                 TypedModCrypto::VerifySigEd25519(v_0, v_1, v_2) => unsafe {
                     let v_0 = BytesObject::from(v_0);
