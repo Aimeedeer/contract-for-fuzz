@@ -1,8 +1,7 @@
 use crate::{syscalls, FakeVal};
-use core::mem;
 use soroban_env_common::{
-    BytesObject, DurationObject, I128Object, I256Object, I64Object, StorageType, SymbolObject,
-    TimepointObject, U128Object, U256Object, U32Val, U64Object,
+    BytesObject, DurationObject, Error, I128Object, I256Object, I64Object, StorageType,
+    SymbolObject, TimepointObject, U128Object, U256Object, U32Val, U64Object,
 };
 use soroban_sdk::contracttype;
 use soroban_sdk::{Address, Bytes, Env, Map, String, Symbol, TryFromVal, Val, Vec};
@@ -142,10 +141,13 @@ pub enum TypedModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModLedger {
+    BumpContractData(FakeVal, u32),
     CreateAssetContract(Bytes),
     CreateContract(Address, Bytes, Bytes),
     DelContractData(FakeVal),
+    GetAssetContractId(Bytes),
     GetContractData(FakeVal),
+    GetContractId(Address, Bytes),
     HasContractData(FakeVal),
     PutContractData(FakeVal, FakeVal, FakeVal),
     UpdateCurrentContractWasm(Bytes),
@@ -331,7 +333,7 @@ impl TypedFuzzInstruction {
                     syscalls::buf::deserialize_from_bytes(v);
                 },
                 TypedModBuf::SerializeToBytes(v) => unsafe {
-                    let v = mem::transmute(v);
+                    let v = Val::try_from_val(env, &v).unwrap();
                     syscalls::buf::serialize_to_bytes(v);
                 },
                 TypedModBuf::StringCopyToLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
@@ -396,12 +398,12 @@ impl TypedFuzzInstruction {
             Context(v) => match v {
                 TypedModContext::ContractEvent(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
-
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::context::contract_event(v_0, v_1);
                 },
                 TypedModContext::FailWithError(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = Error::try_from(&v).unwrap();
                     syscalls::context::fail_with_error(v);
                 },
                 TypedModContext::GetCurrentCallStack => unsafe {
@@ -436,8 +438,8 @@ impl TypedFuzzInstruction {
                     syscalls::context::log_from_linear_memory(v_0, v_1, v_2, v_3);
                 },
                 TypedModContext::ObjCmp(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::context::obj_cmp(v_0, v_1);
                 },
             },
@@ -650,6 +652,11 @@ impl TypedFuzzInstruction {
                 },
             },
             Ledger(v) => match v {
+                TypedModLedger::BumpContractData(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
+                },
                 TypedModLedger::CreateAssetContract(v) => unsafe {
                     let v = v.to_object();
                     syscalls::ledger::create_asset_contract(v);
@@ -661,21 +668,30 @@ impl TypedFuzzInstruction {
                     syscalls::ledger::create_contract(v_0, v_1, v_2);
                 },
                 TypedModLedger::DelContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = Val::try_from_val(env, &v).unwrap();
                     syscalls::ledger::del_contract_data(v, StorageType::Temporary);
                 },
+                TypedModLedger::GetAssetContractId(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::ledger::get_asset_contract_id(v);
+                },
                 TypedModLedger::GetContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = Val::try_from_val(env, &v).unwrap();
                     syscalls::ledger::get_contract_data(v, StorageType::Temporary);
                 },
+                TypedModLedger::GetContractId(v_0, v_1) => unsafe {
+                    let v_0 = v_0.to_object();
+                    let v_1 = BytesObject::from(v_1);
+                    syscalls::ledger::get_contract_id(v_0, v_1);
+                },
                 TypedModLedger::HasContractData(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = Val::try_from_val(env, &v).unwrap();
                     syscalls::ledger::has_contract_data(v, StorageType::Temporary);
                 },
                 TypedModLedger::PutContractData(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_2 = Val::try_from_val(env, &v_2).unwrap();
                     syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
                 },
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
@@ -691,17 +707,17 @@ impl TypedFuzzInstruction {
                 TypedModMap::MapDel(v_0, v_1) => unsafe {
                     // todo: private method
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::map::map_del(v_0, v_1);
                 },
                 TypedModMap::MapGet(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::map::map_get(v_0, v_1);
                 },
                 TypedModMap::MapHas(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::map::map_has(v_0, v_1);
                 },
                 TypedModMap::MapKeys(v) => unsafe {
@@ -731,18 +747,18 @@ impl TypedFuzzInstruction {
                 },
                 TypedModMap::MapNextKey(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::map::map_next_key(v_0, v_1);
                 },
                 TypedModMap::MapPrevKey(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::map::map_prev_key(v_0, v_1);
                 },
                 TypedModMap::MapPut(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_2 = Val::try_from_val(env, &v_2).unwrap();
                     syscalls::map::map_put(v_0, v_1, v_2);
                 },
                 TypedModMap::MapUnpackToLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
@@ -790,7 +806,7 @@ impl TypedFuzzInstruction {
                 },
                 TypedModVec::VecBinarySearch(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::vec::vec_binary_search(v_0, v_1);
                 },
                 TypedModVec::VecDel(v_0, v_1) => unsafe {
@@ -800,7 +816,7 @@ impl TypedFuzzInstruction {
                 },
                 TypedModVec::VecFirstIndexOf(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::vec::vec_first_index_of(v_0, v_1);
                 },
                 TypedModVec::VecFront(v) => unsafe {
@@ -815,12 +831,12 @@ impl TypedFuzzInstruction {
                 TypedModVec::VecInsert(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_2 = Val::try_from_val(env, &v_2).unwrap();
                     syscalls::vec::vec_insert(v_0, v_1, v_2);
                 },
                 TypedModVec::VecLastIndexOf(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::vec::vec_last_index_of(v_0, v_1);
                 },
                 TypedModVec::VecLen(v) => unsafe {
@@ -828,7 +844,7 @@ impl TypedFuzzInstruction {
                     syscalls::vec::vec_len(v);
                 },
                 TypedModVec::VecNew(v) => unsafe {
-                    let v = mem::transmute(v.0);
+                    let v = Val::try_from_val(env, &v).unwrap();
                     syscalls::vec::vec_new(v);
                 },
                 TypedModVec::VecNewFromLinearMemory(v_0, v_1) => unsafe {
@@ -846,18 +862,18 @@ impl TypedFuzzInstruction {
                 },
                 TypedModVec::VecPushBack(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::vec::vec_push_back(v_0, v_1);
                 },
                 TypedModVec::VecPushFront(v_0, v_1) => unsafe {
                     let v_0 = v_0.to_object();
-                    let v_1 = mem::transmute(v_1.0);
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::vec::vec_push_front(v_0, v_1);
                 },
                 TypedModVec::VecPut(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
-                    let v_2 = mem::transmute(v_2.0);
+                    let v_2 = Val::try_from_val(env, &v_2).unwrap();
                     syscalls::vec::vec_put(v_0, v_1, v_2);
                 },
                 TypedModVec::VecSlice(v_0, v_1, v_2) => unsafe {

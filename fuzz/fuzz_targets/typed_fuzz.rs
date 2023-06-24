@@ -278,6 +278,10 @@ pub enum TypedModIntPrototype {
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum TypedModLedgerPrototype {
+    BumpContractData(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
     CreateAssetContract(<Bytes as SorobanArbitrary>::Prototype),
     CreateContract(
         <Address as SorobanArbitrary>::Prototype,
@@ -285,7 +289,12 @@ pub enum TypedModLedgerPrototype {
         <Bytes as SorobanArbitrary>::Prototype,
     ),
     DelContractData(<Val as SorobanArbitrary>::Prototype),
+    GetAssetContractId(<Bytes as SorobanArbitrary>::Prototype),
     GetContractData(<Val as SorobanArbitrary>::Prototype),
+    GetContractId(
+        <Address as SorobanArbitrary>::Prototype,
+        <Bytes as SorobanArbitrary>::Prototype,
+    ),
     HasContractData(<Val as SorobanArbitrary>::Prototype),
     PutContractData(
         <Val as SorobanArbitrary>::Prototype,
@@ -827,6 +836,13 @@ impl TypedFuzzInstructionPrototype {
                 }
             },
             TypedFuzzInstructionPrototype::Ledger(v) => match v {
+                TypedModLedgerPrototype::BumpContractData(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    TypedFuzzInstruction::Ledger(TypedModLedger::BumpContractData(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
                 TypedModLedgerPrototype::CreateAssetContract(v) => {
                     let v = Bytes::from_val(env, v);
                     TypedFuzzInstruction::Ledger(TypedModLedger::CreateAssetContract(v))
@@ -843,11 +859,20 @@ impl TypedFuzzInstructionPrototype {
                         v.get_payload(),
                     )))
                 }
+                TypedModLedgerPrototype::GetAssetContractId(v) => {
+                    let v = Bytes::from_val(env, v);
+                    TypedFuzzInstruction::Ledger(TypedModLedger::GetAssetContractId(v))
+                }
                 TypedModLedgerPrototype::GetContractData(v) => {
                     let v = Val::from_val(env, v);
                     TypedFuzzInstruction::Ledger(TypedModLedger::GetContractData(FakeVal(
                         v.get_payload(),
                     )))
+                }
+                TypedModLedgerPrototype::GetContractId(v_0, v_1) => {
+                    let v_0 = Address::from_val(env, v_0);
+                    let v_1 = Bytes::from_val(env, v_1);
+                    TypedFuzzInstruction::Ledger(TypedModLedger::GetContractId(v_0, v_1))
                 }
                 TypedModLedgerPrototype::HasContractData(v) => {
                     let v = Val::from_val(env, v);

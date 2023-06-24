@@ -277,6 +277,10 @@ pub enum RawModIntPrototype {
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum RawModLedgerPrototype {
+    BumpContractData(
+        <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
     CreateAssetContract(<Val as SorobanArbitrary>::Prototype),
     CreateContract(
         <Val as SorobanArbitrary>::Prototype,
@@ -284,7 +288,12 @@ pub enum RawModLedgerPrototype {
         <Val as SorobanArbitrary>::Prototype,
     ),
     DelContractData(<Val as SorobanArbitrary>::Prototype),
+    GetAssetContractId(<Val as SorobanArbitrary>::Prototype),
     GetContractData(<Val as SorobanArbitrary>::Prototype),
+    GetContractId(
+        <Val as SorobanArbitrary>::Prototype,
+        <Val as SorobanArbitrary>::Prototype,
+    ),
     HasContractData(<Val as SorobanArbitrary>::Prototype),
     PutContractData(
         <Val as SorobanArbitrary>::Prototype,
@@ -870,6 +879,13 @@ impl RawFuzzInstructionPrototype {
                 }
             },
             RawFuzzInstructionPrototype::Ledger(v) => match v {
+                RawModLedgerPrototype::BumpContractData(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    RawFuzzInstruction::Ledger(RawModLedger::BumpContractData(
+                        FakeVal(v_0.get_payload()),
+                        *v_1,
+                    ))
+                }
                 RawModLedgerPrototype::CreateAssetContract(v) => {
                     let v = Val::from_val(env, v);
                     RawFuzzInstruction::Ledger(RawModLedger::CreateAssetContract(FakeVal(
@@ -892,11 +908,25 @@ impl RawFuzzInstructionPrototype {
                         v.get_payload(),
                     )))
                 }
+                RawModLedgerPrototype::GetAssetContractId(v) => {
+                    let v = Val::from_val(env, v);
+                    RawFuzzInstruction::Ledger(RawModLedger::GetAssetContractId(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
                 RawModLedgerPrototype::GetContractData(v) => {
                     let v = Val::from_val(env, v);
                     RawFuzzInstruction::Ledger(RawModLedger::GetContractData(FakeVal(
                         v.get_payload(),
                     )))
+                }
+                RawModLedgerPrototype::GetContractId(v_0, v_1) => {
+                    let v_0 = Val::from_val(env, v_0);
+                    let v_1 = Val::from_val(env, v_1);
+                    RawFuzzInstruction::Ledger(RawModLedger::GetContractId(
+                        FakeVal(v_0.get_payload()),
+                        FakeVal(v_1.get_payload()),
+                    ))
                 }
                 RawModLedgerPrototype::HasContractData(v) => {
                     let v = Val::from_val(env, v);

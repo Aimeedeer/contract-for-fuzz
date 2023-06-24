@@ -138,10 +138,13 @@ pub enum RawModInt {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModLedger {
+    BumpContractData(FakeVal, u32),
     CreateAssetContract(FakeVal),
     CreateContract(FakeVal, FakeVal, FakeVal),
     DelContractData(FakeVal),
+    GetAssetContractId(FakeVal),
     GetContractData(FakeVal),
+    GetContractId(FakeVal, FakeVal),
     HasContractData(FakeVal),
     PutContractData(FakeVal, FakeVal, FakeVal),
     UpdateCurrentContractWasm(FakeVal),
@@ -614,6 +617,11 @@ impl RawFuzzInstruction {
                 },
             },
             Ledger(v) => match v {
+                RawModLedger::BumpContractData(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
+                },
                 RawModLedger::CreateAssetContract(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::create_asset_contract(v);
@@ -628,9 +636,18 @@ impl RawFuzzInstruction {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::del_contract_data(v, StorageType::Temporary);
                 },
+                RawModLedger::GetAssetContractId(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::ledger::get_asset_contract_id(v);
+                },
                 RawModLedger::GetContractData(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::get_contract_data(v, StorageType::Temporary);
+                },
+                RawModLedger::GetContractId(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::ledger::get_contract_id(v_0, v_1);
                 },
                 RawModLedger::HasContractData(v) => unsafe {
                     let v = mem::transmute(v.0);
