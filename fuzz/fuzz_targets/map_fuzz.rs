@@ -129,6 +129,7 @@ impl TypedModMapPrototype {
 
 fuzz_target!(|input: TestCases| {
     let env = Env::default();
+    env.budget().reset_unlimited();
 
     let contract_id = env.register_contract_wasm(None, fuzzcontract::WASM);
 
