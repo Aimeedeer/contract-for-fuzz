@@ -131,6 +131,11 @@ pub enum TypedModInt {
     ObjToU256LoLo(FakeVal),
     TimepointObjFromU64(u64),
     TimepointObjToU64(FakeVal),
+    U256Add(FakeVal, FakeVal), //
+    U256Div(FakeVal, FakeVal), // u256_div
+    U256Mul(FakeVal, FakeVal), // u256_mul
+    U256ValFromBeBytes(Bytes), // u256_obj_from_be_bytes(BytesObject)
+    U256ValToBeBytes(FakeVal), // u256_obj_to_be_bytes(U256Object)
     U256Pow(FakeVal, u32),
     U256Shl(FakeVal, u32),
     U256Shr(FakeVal, u32),
@@ -620,6 +625,36 @@ impl TypedFuzzInstruction {
                     let v = Val::try_from_val(env, &v).unwrap();
                     let v = TimepointObject::try_from(&v).unwrap();
                     syscalls::int::timepoint_obj_to_u64(v);
+                },
+                TypedModInt::U256Add(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Val::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = U256Val::try_from(&v_1).unwrap();
+                    syscalls::int::u256_add(v_0, v_1);
+                },
+                TypedModInt::U256Div(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Val::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = U256Val::try_from(&v_1).unwrap();
+                    syscalls::int::u256_div(v_0, v_1);
+                },
+                TypedModInt::U256Mul(v_0, v_1) => unsafe {
+                    let v_0 = Val::try_from_val(env, &v_0).unwrap();
+                    let v_0 = U256Val::try_from(&v_0).unwrap();
+                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
+                    let v_1 = U256Val::try_from(&v_1).unwrap();
+                    syscalls::int::u256_mul(v_0, v_1);
+                },
+                TypedModInt::U256ValFromBeBytes(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::int::u256_val_from_be_bytes(v);
+                },
+                TypedModInt::U256ValToBeBytes(v) => unsafe {
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = U256Val::try_from(&v).unwrap();
+                    syscalls::int::u256_val_to_be_bytes(v);
                 },
                 TypedModInt::U256Pow(v_0, v_1) => unsafe {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();

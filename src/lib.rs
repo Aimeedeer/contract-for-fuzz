@@ -53,6 +53,10 @@ mod syscalls {
 
     use soroban_env_common::call_macro_with_all_host_functions;
 
+    ///////////////////////////////////////////////////////////////////////////////
+    /// X-macro use: extern mod blocks
+    ///////////////////////////////////////////////////////////////////////////////
+
     // This is a helper macro used only by impl_env_for_guest below. It consumes a
     // token-tree of the form:
     //
@@ -73,6 +77,10 @@ mod syscalls {
         };
     }
 
+    // This is a callback macro that pattern-matches the token-tree passed by the
+    // x-macro (call_macro_with_all_host_functions) and produces a set of mod
+    // items containing extern "C" blocks, each containing extern function
+    // declarations.
     macro_rules! generate_extern_modules {
         {
             $(
@@ -110,9 +118,9 @@ mod syscalls {
                 $(#[$mod_attr])*
                 pub mod $mod_id {
                     #[allow(unused_imports)]
-                    use soroban_env_common::{Val, Object, Symbol, MapObject, VecObject, BytesObject, Error};
+                    use soroban_env_common::{Val,Object,Symbol,Error,MapObject,VecObject,BytesObject};
                     #[allow(unused_imports)]
-                    use soroban_env_common::{I128Object, I256Object, I64Object, I64Val, U128Object, U256Object, U32Val, U64Object, U64Val, StorageType, TimepointObject, DurationObject, U256Val, I256Val};
+                    use soroban_env_common::{I128Object, I256Object, I256Val, I64Object, I64Val, U128Object, U256Object, U256Val, U32Val, U64Object, U64Val, StorageType, TimepointObject, DurationObject};
                     #[allow(unused_imports)]
                     use soroban_env_common::{Void,AddressObject,SymbolObject,StringObject,Bool};
                     #[link(wasm_import_module = $mod_str)]
