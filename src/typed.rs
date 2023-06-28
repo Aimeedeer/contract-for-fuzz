@@ -131,11 +131,11 @@ pub enum TypedModInt {
     ObjToU256LoLo(FakeVal),
     TimepointObjFromU64(u64),
     TimepointObjToU64(FakeVal),
-    U256Add(FakeVal, FakeVal), //
-    U256Div(FakeVal, FakeVal), // u256_div
-    U256Mul(FakeVal, FakeVal), // u256_mul
-    U256ValFromBeBytes(Bytes), // u256_obj_from_be_bytes(BytesObject)
-    U256ValToBeBytes(FakeVal), // u256_obj_to_be_bytes(U256Object)
+    U256Add(FakeVal, FakeVal),
+    U256Div(FakeVal, FakeVal),
+    U256Mul(FakeVal, FakeVal),
+    U256ValFromBeBytes(Bytes),
+    U256ValToBeBytes(FakeVal),
     U256Pow(FakeVal, u32),
     U256Shl(FakeVal, u32),
     U256Shr(FakeVal, u32),

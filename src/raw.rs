@@ -128,6 +128,11 @@ pub enum RawModInt {
     ObjToU256LoLo(FakeVal),
     TimepointObjFromU64(u64),
     TimepointObjToU64(FakeVal),
+    U256Add(FakeVal, FakeVal),
+    U256Div(FakeVal, FakeVal),
+    U256Mul(FakeVal, FakeVal),
+    U256ValFromBeBytes(FakeVal),
+    U256ValToBeBytes(FakeVal),
     U256Pow(FakeVal, u32),
     U256Shl(FakeVal, u32),
     U256Shr(FakeVal, u32),
@@ -590,6 +595,29 @@ impl RawFuzzInstruction {
                 RawModInt::TimepointObjToU64(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::int::timepoint_obj_to_u64(v);
+                },
+                RawModInt::U256Add(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::u256_add(v_0, v_1);
+                },
+                RawModInt::U256Div(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::u256_div(v_0, v_1);
+                },
+                RawModInt::U256Mul(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::int::u256_mul(v_0, v_1);
+                },
+                RawModInt::U256ValFromBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::u256_val_from_be_bytes(v);
+                },
+                RawModInt::U256ValToBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::u256_val_to_be_bytes(v);
                 },
                 RawModInt::U256Pow(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
