@@ -5,7 +5,7 @@ use libfuzzer_sys::fuzz_target;
 use soroban_sdk::arbitrary::arbitrary;
 use soroban_sdk::arbitrary::fuzz_catch_panic;
 use soroban_sdk::arbitrary::SorobanArbitrary;
-use soroban_sdk::testutils::Logger;
+use soroban_sdk::testutils::Logs;
 use soroban_sdk::{Address, Bytes, Vec};
 use soroban_sdk::{Env, FromVal, IntoVal, Map, String, Symbol, Val};
 
@@ -1113,8 +1113,8 @@ fuzz_target!(|input: TypedFuzzInstructionPrototype| {
     });
 
     if panic_r.is_err() {
-        if !env.logger().all().is_empty() {
-            env.logger().print();
+        if !env.logs().all().is_empty() {
+            env.logs().print();
         }
         panic!("host panicked: {panic_r:?}");
     }
