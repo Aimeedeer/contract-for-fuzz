@@ -484,11 +484,11 @@ impl RawFuzzInstruction {
                 },
                 RawModInt::I256ObjFromBeBytes(v) => unsafe {
                     let v = mem::transmute(v.0);
-                    syscalls::int::i256_obj_from_be_bytes(v);
+                    syscalls::int::i256_val_from_be_bytes(v);
                 },
                 RawModInt::I256ObjToBeBytes(v) => unsafe {
                     let v = mem::transmute(v.0);
-                    syscalls::int::i256_obj_to_be_bytes(v);
+                    syscalls::int::i256_val_to_be_bytes(v);
                 },
                 RawModInt::I256Pow(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);

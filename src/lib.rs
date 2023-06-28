@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contractimpl, contracttype, Env, Val};
+use soroban_sdk::{contract, contractimpl, contracttype, Env, Val};
 
 pub mod raw;
 pub mod typed;
@@ -30,6 +30,7 @@ pub enum FuzzInstruction {
     Typed(TypedFuzzInstruction),
 }
 
+#[contract]
 pub struct FuzzContract;
 
 #[contractimpl]
@@ -111,7 +112,7 @@ mod syscalls {
                     #[allow(unused_imports)]
                     use soroban_env_common::{Val, Object, Symbol, MapObject, VecObject, BytesObject, Error};
                     #[allow(unused_imports)]
-                    use soroban_env_common::{I128Object, I256Object, I64Object, I64Val, U128Object, U256Object, U32Val, U64Object, U64Val, StorageType, TimepointObject, DurationObject};
+                    use soroban_env_common::{I128Object, I256Object, I64Object, I64Val, U128Object, U256Object, U32Val, U64Object, U64Val, StorageType, TimepointObject, DurationObject, U256Val, I256Val};
                     #[allow(unused_imports)]
                     use soroban_env_common::{Void,AddressObject,SymbolObject,StringObject,Bool};
                     #[link(wasm_import_module = $mod_str)]
