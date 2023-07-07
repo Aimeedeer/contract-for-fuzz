@@ -38,10 +38,14 @@ impl FuzzContract {
     pub fn run(env: Env, fuzz_instruction: FuzzInstruction) {
         match fuzz_instruction {
             FuzzInstruction::Raw(instr) => {
-                instr.run();
+                for _ in 0..100000 {
+                    instr.clone().run();
+                }
             }
             FuzzInstruction::Typed(instr) => {
-                instr.run(&env);
+                for _ in 0..100000 {
+                    instr.clone().run(&env);
+                }
             }
         }
     }
