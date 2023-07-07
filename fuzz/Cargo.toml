@@ -55,3 +55,9 @@ name = "map_fuzz"
 path = "fuzz_targets/map_fuzz.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "budget_fuzz"
+path = "fuzz_targets/budget_fuzz.rs"
+test = false
+doc = false
