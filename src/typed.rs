@@ -166,12 +166,8 @@ pub enum TypedModMap {
     MapHas(Map<Val, Val>, FakeVal),
     MapKeys(Map<Val, Val>),
     MapLen(Map<Val, Val>),
-    MapMaxKey(Map<Val, Val>),
-    MapMinKey(Map<Val, Val>),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
-    MapNextKey(Map<Val, Val>, FakeVal),
-    MapPrevKey(Map<Val, Val>, FakeVal),
     MapPut(Map<Val, Val>, FakeVal, FakeVal),
     MapUnpackToLinearMemory(Map<Val, Val>, u32, u32, u32),
     MapValues(Map<Val, Val>),
@@ -199,7 +195,7 @@ pub enum TypedModVec {
     VecInsert(Vec<Val>, u32, FakeVal),
     VecLastIndexOf(Vec<Val>, FakeVal),
     VecLen(Vec<Val>),
-    VecNew(FakeVal),
+    VecNew,
     VecNewFromLinearMemory(u32, u32),
     VecPopBack(Vec<Val>),
     VecPopFront(Vec<Val>),
@@ -686,7 +682,7 @@ impl TypedFuzzInstruction {
                 TypedModLedger::BumpContractData(v_0, v_1) => unsafe {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();
                     let v_1 = U32Val::from(v_1);
-                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
+//                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
                 },
                 TypedModLedger::CreateAssetContract(v) => unsafe {
                     let v = v.to_object();
@@ -723,7 +719,7 @@ impl TypedFuzzInstruction {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();
                     let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     let v_2 = Val::try_from_val(env, &v_2).unwrap();
-                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
+//                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
                 },
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = BytesObject::from(v);
@@ -759,14 +755,6 @@ impl TypedFuzzInstruction {
                     let v = v.to_object();
                     syscalls::map::map_len(v);
                 },
-                TypedModMap::MapMaxKey(v) => unsafe {
-                    let v = v.to_object();
-                    syscalls::map::map_max_key(v);
-                },
-                TypedModMap::MapMinKey(v) => unsafe {
-                    let v = v.to_object();
-                    syscalls::map::map_min_key(v);
-                },
                 TypedModMap::MapNew => unsafe {
                     syscalls::map::map_new();
                 },
@@ -775,16 +763,6 @@ impl TypedFuzzInstruction {
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     syscalls::map::map_new_from_linear_memory(v_0, v_1, v_2);
-                },
-                TypedModMap::MapNextKey(v_0, v_1) => unsafe {
-                    let v_0 = v_0.to_object();
-                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
-                    syscalls::map::map_next_key(v_0, v_1);
-                },
-                TypedModMap::MapPrevKey(v_0, v_1) => unsafe {
-                    let v_0 = v_0.to_object();
-                    let v_1 = Val::try_from_val(env, &v_1).unwrap();
-                    syscalls::map::map_prev_key(v_0, v_1);
                 },
                 TypedModMap::MapPut(v_0, v_1, v_2) => unsafe {
                     let v_0 = v_0.to_object();
@@ -874,9 +852,8 @@ impl TypedFuzzInstruction {
                     let v = v.to_object();
                     syscalls::vec::vec_len(v);
                 },
-                TypedModVec::VecNew(v) => unsafe {
-                    let v = Val::try_from_val(env, &v).unwrap();
-                    syscalls::vec::vec_new(v);
+                TypedModVec::VecNew => unsafe {
+                    syscalls::vec::vec_new();
                 },
                 TypedModVec::VecNewFromLinearMemory(v_0, v_1) => unsafe {
                     let v_0 = U32Val::from(v_0);

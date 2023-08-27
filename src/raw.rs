@@ -163,12 +163,8 @@ pub enum RawModMap {
     MapHas(FakeVal, FakeVal),
     MapKeys(FakeVal),
     MapLen(FakeVal),
-    MapMaxKey(FakeVal),
-    MapMinKey(FakeVal),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
-    MapNextKey(FakeVal, FakeVal),
-    MapPrevKey(FakeVal, FakeVal),
     MapPut(FakeVal, FakeVal, FakeVal),
     MapUnpackToLinearMemory(FakeVal, u32, u32, u32),
     MapValues(FakeVal),
@@ -196,7 +192,7 @@ pub enum RawModVec {
     VecInsert(FakeVal, u32, FakeVal),
     VecLastIndexOf(FakeVal, FakeVal),
     VecLen(FakeVal),
-    VecNew(FakeVal),
+    VecNew,
     VecNewFromLinearMemory(u32, u32),
     VecPopBack(FakeVal),
     VecPopFront(FakeVal),
@@ -642,9 +638,10 @@ impl RawFuzzInstruction {
             },
             Ledger(v) => match v {
                 RawModLedger::BumpContractData(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
+                    // todo
+                    //                    let v_0 = mem::transmute(v_0.0);
                     let v_1 = U32Val::from(v_1);
-                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
+//                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
                 },
                 RawModLedger::CreateAssetContract(v) => unsafe {
                     let v = mem::transmute(v.0);
@@ -678,10 +675,11 @@ impl RawFuzzInstruction {
                     syscalls::ledger::has_contract_data(v, StorageType::Temporary);
                 },
                 RawModLedger::PutContractData(v_0, v_1, v_2) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    let v_2 = mem::transmute(v_2.0);
-                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
+                    // todo
+//                    let v_0 = mem::transmute(v_0.0);
+//                    let v_1 = mem::transmute(v_1.0);
+//                    let v_2 = mem::transmute(v_2.0);
+//                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
                 },
                 RawModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = mem::transmute(v.0);
@@ -716,14 +714,6 @@ impl RawFuzzInstruction {
                     let v = mem::transmute(v.0);
                     syscalls::map::map_len(v);
                 },
-                RawModMap::MapMaxKey(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::map::map_max_key(v);
-                },
-                RawModMap::MapMinKey(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::map::map_min_key(v);
-                },
                 RawModMap::MapNew => unsafe {
                     syscalls::map::map_new();
                 },
@@ -732,16 +722,6 @@ impl RawFuzzInstruction {
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     syscalls::map::map_new_from_linear_memory(v_0, v_1, v_2);
-                },
-                RawModMap::MapNextKey(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    syscalls::map::map_next_key(v_0, v_1);
-                },
-                RawModMap::MapPrevKey(v_0, v_1) => unsafe {
-                    let v_0 = mem::transmute(v_0.0);
-                    let v_1 = mem::transmute(v_1.0);
-                    syscalls::map::map_prev_key(v_0, v_1);
                 },
                 RawModMap::MapPut(v_0, v_1, v_2) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
@@ -831,9 +811,8 @@ impl RawFuzzInstruction {
                     let v = mem::transmute(v.0);
                     syscalls::vec::vec_len(v);
                 },
-                RawModVec::VecNew(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::vec::vec_new(v);
+                RawModVec::VecNew => unsafe {
+                    syscalls::vec::vec_new();
                 },
                 RawModVec::VecNewFromLinearMemory(v_0, v_1) => unsafe {
                     let v_0 = U32Val::from(v_0);
