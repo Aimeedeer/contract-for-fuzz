@@ -82,6 +82,7 @@ pub enum TypedModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
+    GetMaxExpirationLedger,
     LogFromLinearMemory(u32, u32, u32, u32),
     ObjCmp(FakeVal, FakeVal),
 }
@@ -103,12 +104,12 @@ pub enum TypedModInt {
     I256Add(FakeVal, FakeVal),
     I256Div(FakeVal, FakeVal),
     I256Mul(FakeVal, FakeVal),
-    I256ObjFromBeBytes(Bytes),
-    I256ObjToBeBytes(FakeVal),
     I256Pow(FakeVal, u32),
     I256Shl(FakeVal, u32),
     I256Shr(FakeVal, u32),
     I256Sub(FakeVal, FakeVal),
+    I256ObjFromBeBytes(Bytes),
+    I256ObjToBeBytes(FakeVal),
     ObjFromI64(i64),
     ObjFromI128Pieces(i64, u64),
     ObjFromI256Pieces(i64, u64, u64, u64),
@@ -134,18 +135,20 @@ pub enum TypedModInt {
     U256Add(FakeVal, FakeVal),
     U256Div(FakeVal, FakeVal),
     U256Mul(FakeVal, FakeVal),
-    U256ValFromBeBytes(Bytes),
-    U256ValToBeBytes(FakeVal),
     U256Pow(FakeVal, u32),
     U256Shl(FakeVal, u32),
     U256Shr(FakeVal, u32),
     U256Sub(FakeVal, FakeVal),
+    U256ValFromBeBytes(Bytes),
+    U256ValToBeBytes(FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum TypedModLedger {
-    BumpContractData(FakeVal, u32),
+    BumpContractData(FakeVal, u32, u32),
+    BumpContractInstanceAndCode(Address, u32, u32),
+    BumpCurrentContract(u32, u32), // BumpCurrentContractInstanceAndCode
     CreateAssetContract(Bytes),
     CreateContract(Address, Bytes, Bytes),
     DelContractData(FakeVal),
@@ -153,7 +156,7 @@ pub enum TypedModLedger {
     GetContractData(FakeVal),
     GetContractId(Address, Bytes),
     HasContractData(FakeVal),
-    PutContractData(FakeVal, FakeVal, FakeVal),
+    PutContractData(FakeVal, FakeVal),
     UpdateCurrentContractWasm(Bytes),
     UploadWasm(Bytes),
 }
@@ -164,12 +167,14 @@ pub enum TypedModMap {
     MapDel(Map<Val, Val>, FakeVal),
     MapGet(Map<Val, Val>, FakeVal),
     MapHas(Map<Val, Val>, FakeVal),
+    MapKeyByPos(Map<Val, Val>, u32),
     MapKeys(Map<Val, Val>),
     MapLen(Map<Val, Val>),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
     MapPut(Map<Val, Val>, FakeVal, FakeVal),
     MapUnpackToLinearMemory(Map<Val, Val>, u32, u32, u32),
+    MapValByPos(Map<Val, Val>, u32),
     MapValues(Map<Val, Val>),
 }
 
@@ -427,6 +432,9 @@ impl TypedFuzzInstruction {
                 TypedModContext::GetLedgerVersion => unsafe {
                     syscalls::context::get_ledger_version();
                 },
+                TypedModContext::GetMaxExpirationLedger => unsafe {
+                    syscalls::context::get_max_expiration_ledger();
+                }
                 TypedModContext::LogFromLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
                     let v_0 = U32Val::from(v_0);
                     let v_1 = U32Val::from(v_1);
@@ -492,15 +500,6 @@ impl TypedFuzzInstruction {
                     let v_1 = I256Val::try_from(&v_1).unwrap();
                     syscalls::int::i256_mul(v_0, v_1);
                 },
-                TypedModInt::I256ObjFromBeBytes(v) => unsafe {
-                    let v = BytesObject::from(v);
-                    syscalls::int::i256_val_from_be_bytes(v);
-                },
-                TypedModInt::I256ObjToBeBytes(v) => unsafe {
-                    let v = Val::try_from_val(env, &v).unwrap();
-                    let v = I256Val::try_from(&v).unwrap();
-                    syscalls::int::i256_val_to_be_bytes(v);
-                },
                 TypedModInt::I256Pow(v_0, v_1) => unsafe {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();
                     let v_0 = I256Val::try_from(&v_0).unwrap();
@@ -525,6 +524,15 @@ impl TypedFuzzInstruction {
                     let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     let v_1 = I256Val::try_from(&v_1).unwrap();
                     syscalls::int::i256_sub(v_0, v_1);
+                },
+                TypedModInt::I256ObjFromBeBytes(v) => unsafe {
+                    let v = BytesObject::from(v);
+                    syscalls::int::i256_val_from_be_bytes(v);
+                },
+                TypedModInt::I256ObjToBeBytes(v) => unsafe {
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = I256Val::try_from(&v).unwrap();
+                    syscalls::int::i256_val_to_be_bytes(v);
                 },
                 TypedModInt::ObjFromI64(v) => unsafe {
                     syscalls::int::obj_from_i64(v);
@@ -643,15 +651,6 @@ impl TypedFuzzInstruction {
                     let v_1 = U256Val::try_from(&v_1).unwrap();
                     syscalls::int::u256_mul(v_0, v_1);
                 },
-                TypedModInt::U256ValFromBeBytes(v) => unsafe {
-                    let v = v.to_object();
-                    syscalls::int::u256_val_from_be_bytes(v);
-                },
-                TypedModInt::U256ValToBeBytes(v) => unsafe {
-                    let v = Val::try_from_val(env, &v).unwrap();
-                    let v = U256Val::try_from(&v).unwrap();
-                    syscalls::int::u256_val_to_be_bytes(v);
-                },
                 TypedModInt::U256Pow(v_0, v_1) => unsafe {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();
                     let v_0 = U256Val::try_from(&v_0).unwrap();
@@ -677,13 +676,34 @@ impl TypedFuzzInstruction {
                     let v_1 = U256Val::try_from(&v_1).unwrap();
                     syscalls::int::u256_sub(v_0, v_1);
                 },
+                TypedModInt::U256ValFromBeBytes(v) => unsafe {
+                    let v = v.to_object();
+                    syscalls::int::u256_val_from_be_bytes(v);
+                },
+                TypedModInt::U256ValToBeBytes(v) => unsafe {
+                    let v = Val::try_from_val(env, &v).unwrap();
+                    let v = U256Val::try_from(&v).unwrap();
+                    syscalls::int::u256_val_to_be_bytes(v);
+                },
             },
             Ledger(v) => match v {
-                TypedModLedger::BumpContractData(v_0, v_1) => unsafe {
+                TypedModLedger::BumpContractData(v_0, v_1, v_2) => unsafe {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();
                     let v_1 = U32Val::from(v_1);
-//                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
+                    let v_2 = U32Val::from(v_2);
+                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1, v_2);
                 },
+                TypedModLedger::BumpContractInstanceAndCode(v_0, v_1, v_2) => unsafe {
+                    let v_0 = v_0.to_object();
+                    let v_1 = U32Val::from(v_1);
+                    let v_2 = U32Val::from(v_2);
+                    syscalls::ledger::bump_contract_instance_and_code(v_0, v_1, v_2);
+                }
+                TypedModLedger::BumpCurrentContract(v_0, v_1) => unsafe {
+                    let v_0 = U32Val::from(v_0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::ledger::bump_current_contract_instance_and_code(v_0, v_1);
+                }
                 TypedModLedger::CreateAssetContract(v) => unsafe {
                     let v = v.to_object();
                     syscalls::ledger::create_asset_contract(v);
@@ -715,11 +735,10 @@ impl TypedFuzzInstruction {
                     let v = Val::try_from_val(env, &v).unwrap();
                     syscalls::ledger::has_contract_data(v, StorageType::Temporary);
                 },
-                TypedModLedger::PutContractData(v_0, v_1, v_2) => unsafe {
+                TypedModLedger::PutContractData(v_0, v_1) => unsafe {
                     let v_0 = Val::try_from_val(env, &v_0).unwrap();
                     let v_1 = Val::try_from_val(env, &v_1).unwrap();
-                    let v_2 = Val::try_from_val(env, &v_2).unwrap();
-//                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
+                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary);
                 },
                 TypedModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = BytesObject::from(v);
@@ -747,6 +766,11 @@ impl TypedFuzzInstruction {
                     let v_1 = Val::try_from_val(env, &v_1).unwrap();
                     syscalls::map::map_has(v_0, v_1);
                 },
+                TypedModMap::MapKeyByPos(v_0, v_1) => unsafe {
+                    let v_0 = v_0.to_object();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::map::map_key_by_pos(v_0, v_1);
+                }
                 TypedModMap::MapKeys(v) => unsafe {
                     let v = v.to_object();
                     syscalls::map::map_keys(v);
@@ -778,6 +802,11 @@ impl TypedFuzzInstruction {
 
                     syscalls::map::map_unpack_to_linear_memory(v_0, v_1, v_2, v_3);
                 },
+                TypedModMap::MapValByPos(v_0, v_1) => unsafe {
+                    let v_0 = v_0.to_object();
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::map::map_val_by_pos(v_0, v_1);
+                }
                 TypedModMap::MapValues(v) => unsafe {
                     let v = v.to_object();
                     syscalls::map::map_values(v);

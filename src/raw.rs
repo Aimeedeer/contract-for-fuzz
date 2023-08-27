@@ -79,6 +79,7 @@ pub enum RawModContext {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
+    GetMaxExpirationLedger,
     LogFromLinearMemory(u32, u32, u32, u32),
     ObjCmp(FakeVal, FakeVal),
 }
@@ -100,12 +101,12 @@ pub enum RawModInt {
     I256Add(FakeVal, FakeVal),
     I256Div(FakeVal, FakeVal),
     I256Mul(FakeVal, FakeVal),
-    I256ObjFromBeBytes(FakeVal),
-    I256ObjToBeBytes(FakeVal),
     I256Pow(FakeVal, u32),
     I256Shl(FakeVal, u32),
     I256Shr(FakeVal, u32),
     I256Sub(FakeVal, FakeVal),
+    I256ObjFromBeBytes(FakeVal),
+    I256ObjToBeBytes(FakeVal),
     ObjFromI64(i64),
     ObjFromI128Pieces(i64, u64),
     ObjFromI256Pieces(i64, u64, u64, u64),
@@ -131,18 +132,20 @@ pub enum RawModInt {
     U256Add(FakeVal, FakeVal),
     U256Div(FakeVal, FakeVal),
     U256Mul(FakeVal, FakeVal),
-    U256ValFromBeBytes(FakeVal),
-    U256ValToBeBytes(FakeVal),
     U256Pow(FakeVal, u32),
     U256Shl(FakeVal, u32),
     U256Shr(FakeVal, u32),
     U256Sub(FakeVal, FakeVal),
+    U256ValFromBeBytes(FakeVal),
+    U256ValToBeBytes(FakeVal),
 }
 
 #[contracttype]
 #[derive(Clone, Debug)]
 pub enum RawModLedger {
-    BumpContractData(FakeVal, u32),
+    BumpContractData(FakeVal, u32, u32),
+    BumpContractInstanceAndCode(FakeVal, u32, u32),
+    BumpCurrentContract(u32, u32), // BumpCurrentContractInstanceAndCode
     CreateAssetContract(FakeVal),
     CreateContract(FakeVal, FakeVal, FakeVal),
     DelContractData(FakeVal),
@@ -150,7 +153,7 @@ pub enum RawModLedger {
     GetContractData(FakeVal),
     GetContractId(FakeVal, FakeVal),
     HasContractData(FakeVal),
-    PutContractData(FakeVal, FakeVal, FakeVal),
+    PutContractData(FakeVal, FakeVal),
     UpdateCurrentContractWasm(FakeVal),
     UploadWasm(FakeVal),
 }
@@ -161,12 +164,14 @@ pub enum RawModMap {
     MapDel(FakeVal, FakeVal),
     MapGet(FakeVal, FakeVal),
     MapHas(FakeVal, FakeVal),
+    MapKeyByPos(FakeVal, u32),
     MapKeys(FakeVal),
     MapLen(FakeVal),
     MapNew,
     MapNewFromLinearMemory(u32, u32, u32),
     MapPut(FakeVal, FakeVal, FakeVal),
     MapUnpackToLinearMemory(FakeVal, u32, u32, u32),
+    MapValByPos(FakeVal, u32),
     MapValues(FakeVal),
 }
 
@@ -425,6 +430,9 @@ impl RawFuzzInstruction {
                 RawModContext::GetLedgerVersion => unsafe {
                     syscalls::context::get_ledger_version();
                 },
+                RawModContext::GetMaxExpirationLedger => unsafe {
+                    syscalls::context::get_max_expiration_ledger();
+                }
                 RawModContext::LogFromLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
                     let v_0 = U32Val::from(v_0);
                     let v_1 = U32Val::from(v_1);
@@ -483,14 +491,6 @@ impl RawFuzzInstruction {
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::int::i256_mul(v_0, v_1);
                 },
-                RawModInt::I256ObjFromBeBytes(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::int::i256_val_from_be_bytes(v);
-                },
-                RawModInt::I256ObjToBeBytes(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::int::i256_val_to_be_bytes(v);
-                },
                 RawModInt::I256Pow(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = U32Val::from(v_1);
@@ -510,6 +510,14 @@ impl RawFuzzInstruction {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::int::i256_sub(v_0, v_1);
+                },
+                RawModInt::I256ObjFromBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::i256_val_from_be_bytes(v);
+                },
+                RawModInt::I256ObjToBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::i256_val_to_be_bytes(v);
                 },
                 RawModInt::ObjFromI64(v) => unsafe {
                     syscalls::int::obj_from_i64(v);
@@ -607,14 +615,6 @@ impl RawFuzzInstruction {
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::int::u256_mul(v_0, v_1);
                 },
-                RawModInt::U256ValFromBeBytes(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::int::u256_val_from_be_bytes(v);
-                },
-                RawModInt::U256ValToBeBytes(v) => unsafe {
-                    let v = mem::transmute(v.0);
-                    syscalls::int::u256_val_to_be_bytes(v);
-                },
                 RawModInt::U256Pow(v_0, v_1) => unsafe {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = U32Val::from(v_1);
@@ -635,14 +635,33 @@ impl RawFuzzInstruction {
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::int::u256_sub(v_0, v_1);
                 },
+                RawModInt::U256ValFromBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::u256_val_from_be_bytes(v);
+                },
+                RawModInt::U256ValToBeBytes(v) => unsafe {
+                    let v = mem::transmute(v.0);
+                    syscalls::int::u256_val_to_be_bytes(v);
+                },
             },
             Ledger(v) => match v {
-                RawModLedger::BumpContractData(v_0, v_1) => unsafe {
-                    // todo
-                    //                    let v_0 = mem::transmute(v_0.0);
+                RawModLedger::BumpContractData(v_0, v_1, v_2) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
                     let v_1 = U32Val::from(v_1);
-//                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1);
+                    let v_2 = U32Val::from(v_2);
+                    syscalls::ledger::bump_contract_data(v_0, StorageType::Temporary, v_1, v_2);
                 },
+                RawModLedger::BumpContractInstanceAndCode(v_0, v_1, v_2) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    let v_2 = U32Val::from(v_2);
+                    syscalls::ledger::bump_contract_instance_and_code(v_0, v_1, v_2);
+                }
+                RawModLedger::BumpCurrentContract(v_0, v_1) => unsafe {
+                    let v_0 = U32Val::from(v_0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::ledger::bump_current_contract_instance_and_code(v_0, v_1);
+                }
                 RawModLedger::CreateAssetContract(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::create_asset_contract(v);
@@ -674,12 +693,10 @@ impl RawFuzzInstruction {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::has_contract_data(v, StorageType::Temporary);
                 },
-                RawModLedger::PutContractData(v_0, v_1, v_2) => unsafe {
-                    // todo
-//                    let v_0 = mem::transmute(v_0.0);
-//                    let v_1 = mem::transmute(v_1.0);
-//                    let v_2 = mem::transmute(v_2.0);
-//                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary, v_2);
+                RawModLedger::PutContractData(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = mem::transmute(v_1.0);
+                    syscalls::ledger::put_contract_data(v_0, v_1, StorageType::Temporary);
                 },
                 RawModLedger::UpdateCurrentContractWasm(v) => unsafe {
                     let v = mem::transmute(v.0);
@@ -706,6 +723,11 @@ impl RawFuzzInstruction {
                     let v_1 = mem::transmute(v_1.0);
                     syscalls::map::map_has(v_0, v_1);
                 },
+                RawModMap::MapKeyByPos(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::map::map_key_by_pos(v_0, v_1);
+                }
                 RawModMap::MapKeys(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::map::map_keys(v);
@@ -737,6 +759,11 @@ impl RawFuzzInstruction {
 
                     syscalls::map::map_unpack_to_linear_memory(v_0, v_1, v_2, v_3);
                 },
+                RawModMap::MapValByPos(v_0, v_1) => unsafe {
+                    let v_0 = mem::transmute(v_0.0);
+                    let v_1 = U32Val::from(v_1);
+                    syscalls::map::map_val_by_pos(v_0, v_1);
+                }
                 RawModMap::MapValues(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::map::map_values(v);
