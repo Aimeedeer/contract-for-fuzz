@@ -432,7 +432,7 @@ impl RawFuzzInstruction {
                 },
                 RawModContext::GetMaxExpirationLedger => unsafe {
                     syscalls::context::get_max_expiration_ledger();
-                }
+                },
                 RawModContext::LogFromLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
                     let v_0 = U32Val::from(v_0);
                     let v_1 = U32Val::from(v_1);
@@ -656,12 +656,12 @@ impl RawFuzzInstruction {
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     syscalls::ledger::bump_contract_instance_and_code(v_0, v_1, v_2);
-                }
+                },
                 RawModLedger::BumpCurrentContract(v_0, v_1) => unsafe {
                     let v_0 = U32Val::from(v_0);
                     let v_1 = U32Val::from(v_1);
                     syscalls::ledger::bump_current_contract_instance_and_code(v_0, v_1);
-                }
+                },
                 RawModLedger::CreateAssetContract(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::ledger::create_asset_contract(v);
@@ -727,7 +727,7 @@ impl RawFuzzInstruction {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = U32Val::from(v_1);
                     syscalls::map::map_key_by_pos(v_0, v_1);
-                }
+                },
                 RawModMap::MapKeys(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::map::map_keys(v);
@@ -763,7 +763,7 @@ impl RawFuzzInstruction {
                     let v_0 = mem::transmute(v_0.0);
                     let v_1 = U32Val::from(v_1);
                     syscalls::map::map_val_by_pos(v_0, v_1);
-                }
+                },
                 RawModMap::MapValues(v) => unsafe {
                     let v = mem::transmute(v.0);
                     syscalls::map::map_values(v);

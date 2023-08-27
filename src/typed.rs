@@ -434,7 +434,7 @@ impl TypedFuzzInstruction {
                 },
                 TypedModContext::GetMaxExpirationLedger => unsafe {
                     syscalls::context::get_max_expiration_ledger();
-                }
+                },
                 TypedModContext::LogFromLinearMemory(v_0, v_1, v_2, v_3) => unsafe {
                     let v_0 = U32Val::from(v_0);
                     let v_1 = U32Val::from(v_1);
@@ -698,12 +698,12 @@ impl TypedFuzzInstruction {
                     let v_1 = U32Val::from(v_1);
                     let v_2 = U32Val::from(v_2);
                     syscalls::ledger::bump_contract_instance_and_code(v_0, v_1, v_2);
-                }
+                },
                 TypedModLedger::BumpCurrentContract(v_0, v_1) => unsafe {
                     let v_0 = U32Val::from(v_0);
                     let v_1 = U32Val::from(v_1);
                     syscalls::ledger::bump_current_contract_instance_and_code(v_0, v_1);
-                }
+                },
                 TypedModLedger::CreateAssetContract(v) => unsafe {
                     let v = v.to_object();
                     syscalls::ledger::create_asset_contract(v);
@@ -770,7 +770,7 @@ impl TypedFuzzInstruction {
                     let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     syscalls::map::map_key_by_pos(v_0, v_1);
-                }
+                },
                 TypedModMap::MapKeys(v) => unsafe {
                     let v = v.to_object();
                     syscalls::map::map_keys(v);
@@ -806,7 +806,7 @@ impl TypedFuzzInstruction {
                     let v_0 = v_0.to_object();
                     let v_1 = U32Val::from(v_1);
                     syscalls::map::map_val_by_pos(v_0, v_1);
-                }
+                },
                 TypedModMap::MapValues(v) => unsafe {
                     let v = v.to_object();
                     syscalls::map::map_values(v);
