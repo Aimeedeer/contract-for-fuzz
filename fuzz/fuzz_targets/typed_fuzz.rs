@@ -157,6 +157,7 @@ pub enum TypedModContextPrototype {
     GetLedgerSequence,
     GetLedgerTimestamp,
     GetLedgerVersion,
+    GetMaxExpirationLedger,
     LogFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -201,8 +202,6 @@ pub enum TypedModIntPrototype {
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
     ),
-    I256ObjFromBeBytes(<Bytes as SorobanArbitrary>::Prototype),
-    I256ObjToBeBytes(<Val as SorobanArbitrary>::Prototype),
     I256Pow(
         <Val as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -219,6 +218,8 @@ pub enum TypedModIntPrototype {
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
     ),
+    I256ObjFromBeBytes(<Bytes as SorobanArbitrary>::Prototype),
+    I256ObjToBeBytes(<Val as SorobanArbitrary>::Prototype),
     ObjFromI64(<i64 as SorobanArbitrary>::Prototype),
     ObjFromI128Pieces(
         <i64 as SorobanArbitrary>::Prototype,
@@ -269,8 +270,6 @@ pub enum TypedModIntPrototype {
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
     ),
-    U256ValFromBeBytes(<Bytes as SorobanArbitrary>::Prototype),
-    U256ValToBeBytes(<Val as SorobanArbitrary>::Prototype),
     U256Pow(
         <Val as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -287,12 +286,24 @@ pub enum TypedModIntPrototype {
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
     ),
+    U256ValFromBeBytes(<Bytes as SorobanArbitrary>::Prototype),
+    U256ValToBeBytes(<Val as SorobanArbitrary>::Prototype),
 }
 
 #[derive(Clone, Debug, arbitrary::Arbitrary)]
 pub enum TypedModLedgerPrototype {
     BumpContractData(
         <Val as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    BumpContractInstanceAndCode(
+        <Address as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    BumpCurrentContract(
+        <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     CreateAssetContract(<Bytes as SorobanArbitrary>::Prototype),
@@ -310,7 +321,6 @@ pub enum TypedModLedgerPrototype {
     ),
     HasContractData(<Val as SorobanArbitrary>::Prototype),
     PutContractData(
-        <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
     ),
@@ -332,23 +342,17 @@ pub enum TypedModMapPrototype {
         <Map<Val, Val> as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
     ),
+    MapKeyByPos(
+        <Map<Val, Val> as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
     MapKeys(<Map<Val, Val> as SorobanArbitrary>::Prototype),
     MapLen(<Map<Val, Val> as SorobanArbitrary>::Prototype),
-    MapMaxKey(<Map<Val, Val> as SorobanArbitrary>::Prototype),
-    MapMinKey(<Map<Val, Val> as SorobanArbitrary>::Prototype),
     MapNew,
     MapNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
-    ),
-    MapNextKey(
-        <Map<Val, Val> as SorobanArbitrary>::Prototype,
-        <Val as SorobanArbitrary>::Prototype,
-    ),
-    MapPrevKey(
-        <Map<Val, Val> as SorobanArbitrary>::Prototype,
-        <Val as SorobanArbitrary>::Prototype,
     ),
     MapPut(
         <Map<Val, Val> as SorobanArbitrary>::Prototype,
@@ -359,6 +363,10 @@ pub enum TypedModMapPrototype {
         <Map<Val, Val> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
+        <u32 as SorobanArbitrary>::Prototype,
+    ),
+    MapValByPos(
+        <Map<Val, Val> as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
     MapValues(<Map<Val, Val> as SorobanArbitrary>::Prototype),
@@ -406,7 +414,7 @@ pub enum TypedModVecPrototype {
         <Val as SorobanArbitrary>::Prototype,
     ),
     VecLen(<Vec<Val> as SorobanArbitrary>::Prototype),
-    VecNew(<Val as SorobanArbitrary>::Prototype),
+    VecNew,
     VecNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -624,6 +632,9 @@ impl TypedFuzzInstructionPrototype {
                 TypedModContextPrototype::GetLedgerVersion => {
                     TypedFuzzInstruction::Context(TypedModContext::GetLedgerVersion)
                 }
+                TypedModContextPrototype::GetMaxExpirationLedger => {
+                    TypedFuzzInstruction::Context(TypedModContext::GetMaxExpirationLedger)
+                }
                 TypedModContextPrototype::LogFromLinearMemory(v_0, v_1, v_2, v_3) => {
                     TypedFuzzInstruction::Context(TypedModContext::LogFromLinearMemory(
                         *v_0, *v_1, *v_2, *v_3,
@@ -695,16 +706,6 @@ impl TypedFuzzInstructionPrototype {
                         FakeVal(v_1.get_payload()),
                     ))
                 }
-                TypedModIntPrototype::I256ObjFromBeBytes(v) => {
-                    let v = Bytes::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::I256ObjFromBeBytes(v))
-                }
-                TypedModIntPrototype::I256ObjToBeBytes(v) => {
-                    let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::I256ObjToBeBytes(FakeVal(
-                        v.get_payload(),
-                    )))
-                }
                 TypedModIntPrototype::I256Pow(v_0, v_1) => {
                     let v_0 = Val::from_val(env, v_0);
                     TypedFuzzInstruction::Int(TypedModInt::I256Pow(
@@ -733,6 +734,16 @@ impl TypedFuzzInstructionPrototype {
                         FakeVal(v_0.get_payload()),
                         FakeVal(v_1.get_payload()),
                     ))
+                }
+                TypedModIntPrototype::I256ObjFromBeBytes(v) => {
+                    let v = Bytes::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::I256ObjFromBeBytes(v))
+                }
+                TypedModIntPrototype::I256ObjToBeBytes(v) => {
+                    let v = Val::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::I256ObjToBeBytes(FakeVal(
+                        v.get_payload(),
+                    )))
                 }
                 TypedModIntPrototype::ObjFromI64(v) => {
                     TypedFuzzInstruction::Int(TypedModInt::ObjFromI64(*v))
@@ -839,16 +850,6 @@ impl TypedFuzzInstructionPrototype {
                         FakeVal(v_1.get_payload()),
                     ))
                 }
-                TypedModIntPrototype::U256ValFromBeBytes(v) => {
-                    let v = Bytes::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::U256ValFromBeBytes(v))
-                }
-                TypedModIntPrototype::U256ValToBeBytes(v) => {
-                    let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Int(TypedModInt::U256ValToBeBytes(FakeVal(
-                        v.get_payload(),
-                    )))
-                }
                 TypedModIntPrototype::U256Pow(v_0, v_1) => {
                     let v_0 = Val::from_val(env, v_0);
                     TypedFuzzInstruction::Int(TypedModInt::U256Pow(
@@ -878,14 +879,34 @@ impl TypedFuzzInstructionPrototype {
                         FakeVal(v_1.get_payload()),
                     ))
                 }
+                TypedModIntPrototype::U256ValFromBeBytes(v) => {
+                    let v = Bytes::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::U256ValFromBeBytes(v))
+                }
+                TypedModIntPrototype::U256ValToBeBytes(v) => {
+                    let v = Val::from_val(env, v);
+                    TypedFuzzInstruction::Int(TypedModInt::U256ValToBeBytes(FakeVal(
+                        v.get_payload(),
+                    )))
+                }
             },
             TypedFuzzInstructionPrototype::Ledger(v) => match v {
-                TypedModLedgerPrototype::BumpContractData(v_0, v_1) => {
+                TypedModLedgerPrototype::BumpContractData(v_0, v_1, v_2) => {
                     let v_0 = Val::from_val(env, v_0);
                     TypedFuzzInstruction::Ledger(TypedModLedger::BumpContractData(
                         FakeVal(v_0.get_payload()),
                         *v_1,
+                        *v_2,
                     ))
+                }
+                TypedModLedgerPrototype::BumpContractInstanceAndCode(v_0, v_1, v_2) => {
+                    let v_0 = Address::from_val(env, v_0);
+                    TypedFuzzInstruction::Ledger(TypedModLedger::BumpContractInstanceAndCode(
+                        v_0, *v_1, *v_2,
+                    ))
+                }
+                TypedModLedgerPrototype::BumpCurrentContract(v_0, v_1) => {
+                    TypedFuzzInstruction::Ledger(TypedModLedger::BumpCurrentContract(*v_0, *v_1))
                 }
                 TypedModLedgerPrototype::CreateAssetContract(v) => {
                     let v = Bytes::from_val(env, v);
@@ -924,14 +945,12 @@ impl TypedFuzzInstructionPrototype {
                         v.get_payload(),
                     )))
                 }
-                TypedModLedgerPrototype::PutContractData(v_0, v_1, v_2) => {
+                TypedModLedgerPrototype::PutContractData(v_0, v_1) => {
                     let v_0 = Val::from_val(env, v_0);
                     let v_1 = Val::from_val(env, v_1);
-                    let v_2 = Val::from_val(env, v_2);
                     TypedFuzzInstruction::Ledger(TypedModLedger::PutContractData(
                         FakeVal(v_0.get_payload()),
                         FakeVal(v_1.get_payload()),
-                        FakeVal(v_2.get_payload()),
                     ))
                 }
                 TypedModLedgerPrototype::UpdateCurrentContractWasm(v) => {
@@ -959,6 +978,10 @@ impl TypedFuzzInstructionPrototype {
                     let v_1 = Val::from_val(env, v_1);
                     TypedFuzzInstruction::Map(TypedModMap::MapHas(v_0, FakeVal(v_1.get_payload())))
                 }
+                TypedModMapPrototype::MapKeyByPos(v_0, v_1) => {
+                    let v_0 = Map::<Val, Val>::from_val(env, v_0);
+                    TypedFuzzInstruction::Map(TypedModMap::MapKeyByPos(v_0, *v_1))
+                }
                 TypedModMapPrototype::MapKeys(v) => {
                     let v = Map::<Val, Val>::from_val(env, v);
                     TypedFuzzInstruction::Map(TypedModMap::MapKeys(v))
@@ -967,33 +990,9 @@ impl TypedFuzzInstructionPrototype {
                     let v = Map::<Val, Val>::from_val(env, v);
                     TypedFuzzInstruction::Map(TypedModMap::MapLen(v))
                 }
-                TypedModMapPrototype::MapMaxKey(v) => {
-                    let v = Map::<Val, Val>::from_val(env, v);
-                    TypedFuzzInstruction::Map(TypedModMap::MapMaxKey(v))
-                }
-                TypedModMapPrototype::MapMinKey(v) => {
-                    let v = Map::<Val, Val>::from_val(env, v);
-                    TypedFuzzInstruction::Map(TypedModMap::MapMinKey(v))
-                }
                 TypedModMapPrototype::MapNew => TypedFuzzInstruction::Map(TypedModMap::MapNew),
                 TypedModMapPrototype::MapNewFromLinearMemory(v_0, v_1, v_2) => {
                     TypedFuzzInstruction::Map(TypedModMap::MapNewFromLinearMemory(*v_0, *v_1, *v_2))
-                }
-                TypedModMapPrototype::MapNextKey(v_0, v_1) => {
-                    let v_0 = Map::<Val, Val>::from_val(env, v_0);
-                    let v_1 = Val::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapNextKey(
-                        v_0,
-                        FakeVal(v_1.get_payload()),
-                    ))
-                }
-                TypedModMapPrototype::MapPrevKey(v_0, v_1) => {
-                    let v_0 = Map::<Val, Val>::from_val(env, v_0);
-                    let v_1 = Val::from_val(env, v_1);
-                    TypedFuzzInstruction::Map(TypedModMap::MapPrevKey(
-                        v_0,
-                        FakeVal(v_1.get_payload()),
-                    ))
                 }
                 TypedModMapPrototype::MapPut(v_0, v_1, v_2) => {
                     let v_0 = Map::<Val, Val>::from_val(env, v_0);
@@ -1010,6 +1009,10 @@ impl TypedFuzzInstructionPrototype {
                     TypedFuzzInstruction::Map(TypedModMap::MapUnpackToLinearMemory(
                         v_0, *v_1, *v_2, *v_3,
                     ))
+                }
+                TypedModMapPrototype::MapValByPos(v_0, v_1) => {
+                    let v_0 = Map::<Val, Val>::from_val(env, v_0);
+                    TypedFuzzInstruction::Map(TypedModMap::MapValByPos(v_0, *v_1))
                 }
                 TypedModMapPrototype::MapValues(v) => {
                     let v = Map::<Val, Val>::from_val(env, v);
@@ -1092,10 +1095,7 @@ impl TypedFuzzInstructionPrototype {
                     let v = Vec::<Val>::from_val(env, v);
                     TypedFuzzInstruction::Vec(TypedModVec::VecLen(v))
                 }
-                TypedModVecPrototype::VecNew(v) => {
-                    let v = Val::from_val(env, v);
-                    TypedFuzzInstruction::Vec(TypedModVec::VecNew(FakeVal(v.get_payload())))
-                }
+                TypedModVecPrototype::VecNew => TypedFuzzInstruction::Vec(TypedModVec::VecNew),
                 TypedModVecPrototype::VecNewFromLinearMemory(v_0, v_1) => {
                     TypedFuzzInstruction::Vec(TypedModVec::VecNewFromLinearMemory(*v_0, *v_1))
                 }

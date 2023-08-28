@@ -36,7 +36,7 @@ pub enum TypedModVecPrototype {
     ),
     VecLastIndexOf(<u64 as SorobanArbitrary>::Prototype),
     VecLen,
-    VecNew(<u32 as SorobanArbitrary>::Prototype),
+    VecNew,
     VecNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
@@ -109,10 +109,7 @@ impl TypedModVecPrototype {
             TypedModVecPrototype::VecLen => {
                 TypedFuzzInstruction::Vec(TypedModVec::VecLen(v_0.clone()))
             }
-            TypedModVecPrototype::VecNew(v) => {
-                let v = Val::from_val(env, v);
-                TypedFuzzInstruction::Vec(TypedModVec::VecNew(FakeVal(v.get_payload())))
-            }
+            TypedModVecPrototype::VecNew => TypedFuzzInstruction::Vec(TypedModVec::VecNew),
             TypedModVecPrototype::VecNewFromLinearMemory(v_0, v_1) => {
                 TypedFuzzInstruction::Vec(TypedModVec::VecNewFromLinearMemory(*v_0, *v_1))
             }

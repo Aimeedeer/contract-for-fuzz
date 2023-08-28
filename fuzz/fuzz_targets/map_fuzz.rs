@@ -25,18 +25,15 @@ pub enum TypedModMapPrototype {
     MapDel(<Val as SorobanArbitrary>::Prototype),
     MapGet(<Val as SorobanArbitrary>::Prototype),
     MapHas(<Val as SorobanArbitrary>::Prototype),
+    MapKeyByPos(<u32 as SorobanArbitrary>::Prototype),
     MapKeys,
     MapLen,
-    MapMaxKey,
-    MapMinKey,
     MapNew,
     MapNewFromLinearMemory(
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
-    MapNextKey(<Val as SorobanArbitrary>::Prototype),
-    MapPrevKey(<Val as SorobanArbitrary>::Prototype),
     MapPut(
         <Val as SorobanArbitrary>::Prototype,
         <Val as SorobanArbitrary>::Prototype,
@@ -46,6 +43,7 @@ pub enum TypedModMapPrototype {
         <u32 as SorobanArbitrary>::Prototype,
         <u32 as SorobanArbitrary>::Prototype,
     ),
+    MapValByPos(<u32 as SorobanArbitrary>::Prototype),
     MapValues,
 }
 
@@ -73,35 +71,18 @@ impl TypedModMapPrototype {
                     FakeVal(v.get_payload()),
                 ))
             }
+            TypedModMapPrototype::MapKeyByPos(v) => {
+                TypedFuzzInstruction::Map(TypedModMap::MapKeyByPos(map.clone(), *v))
+            }
             TypedModMapPrototype::MapKeys => {
                 TypedFuzzInstruction::Map(TypedModMap::MapKeys(map.clone()))
             }
             TypedModMapPrototype::MapLen => {
                 TypedFuzzInstruction::Map(TypedModMap::MapLen(map.clone()))
             }
-            TypedModMapPrototype::MapMaxKey => {
-                TypedFuzzInstruction::Map(TypedModMap::MapMaxKey(map.clone()))
-            }
-            TypedModMapPrototype::MapMinKey => {
-                TypedFuzzInstruction::Map(TypedModMap::MapMinKey(map.clone()))
-            }
             TypedModMapPrototype::MapNew => TypedFuzzInstruction::Map(TypedModMap::MapNew),
             TypedModMapPrototype::MapNewFromLinearMemory(v_0, v_1, v_2) => {
                 TypedFuzzInstruction::Map(TypedModMap::MapNewFromLinearMemory(*v_0, *v_1, *v_2))
-            }
-            TypedModMapPrototype::MapNextKey(v) => {
-                let v = Val::from_val(env, v);
-                TypedFuzzInstruction::Map(TypedModMap::MapNextKey(
-                    map.clone(),
-                    FakeVal(v.get_payload()),
-                ))
-            }
-            TypedModMapPrototype::MapPrevKey(v) => {
-                let v = Val::from_val(env, v);
-                TypedFuzzInstruction::Map(TypedModMap::MapPrevKey(
-                    map.clone(),
-                    FakeVal(v.get_payload()),
-                ))
             }
             TypedModMapPrototype::MapPut(v_0, v_1) => {
                 let v_0 = Val::from_val(env, v_0);
@@ -119,6 +100,9 @@ impl TypedModMapPrototype {
                     *v_1,
                     *v_2,
                 ))
+            }
+            TypedModMapPrototype::MapValByPos(v) => {
+                TypedFuzzInstruction::Map(TypedModMap::MapValByPos(map.clone(), *v))
             }
             TypedModMapPrototype::MapValues => {
                 TypedFuzzInstruction::Map(TypedModMap::MapValues(map.clone()))
