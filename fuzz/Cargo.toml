@@ -9,13 +9,10 @@ cargo-fuzz = true
 
 [features]
 default = ["testutils"]
-testutils = ["soroban-sdk/testutils", "contract-for-fuzz/testutils"]
+testutils = ["soroban-sdk/testutils"]
 
 [dependencies]
 libfuzzer-sys = "0.4"
-
-[dependencies.contract-for-fuzz]
-path = ".."
 
 [dependencies.soroban-sdk]
 path = "../../rs-soroban-sdk/soroban-sdk"
